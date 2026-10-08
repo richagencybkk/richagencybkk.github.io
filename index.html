@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Condos for rent & sale in Bangkok. Message Rich Agency on WhatsApp or LINE.">
+<meta property="og:title" content="Rich Agency — Bangkok Condos">
+<meta property="og:description" content="Condos for rent & sale in Bangkok. Tap to message me on WhatsApp or LINE.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#050505">
+<style>*,*::before,*::after{box-sizing:border-box}html,body{height:auto}body{margin:0;-webkit-font-smoothing:antialiased}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Rich Agency — Bangkok Condos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Manrope:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow column — 3D glass tower on canvas, name, two glass contact buttons, IDs to copy. Single committed black & white look. */
+:root{
+  --bg:#050505;
+  --ink:#f4f4f2;
+  --mute:#8d8d89;
+  --glass:rgba(255,255,255,.07);
+  --glass-hi:rgba(255,255,255,.16);
+  --line:rgba(255,255,255,.18);
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);min-height:100%;overflow-x:hidden}
+.bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(60% 40% at 50% 18%,rgba(255,255,255,.10),transparent 70%),
+    radial-gradient(40% 30% at 85% 90%,rgba(255,255,255,.05),transparent 70%);}
+.wrap{position:relative;z-index:1;max-width:440px;margin:0 auto;padding-inline:20px;padding-block:12px 40px;display:flex;flex-direction:column;gap:22px}
+
+.stage{position:relative;height:min(470px,64vh);min-height:340px;border-radius:32px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 30px 80px -30px rgba(0,0,0,.9);}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .hint{position:absolute;bottom:14px;left:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--mute);pointer-events:none;transition:opacity .6s}
+.stage .reset{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--glass);color:var(--ink);display:grid;place-items:center;cursor:pointer;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.stage .reset svg{width:16px;height:16px}
+.stage .reset:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.stage .tag{position:absolute;top:16px;left:18px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.stage .tag b{color:var(--ink);font-weight:500}
+.stage .coord{position:absolute;top:34px;left:18px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--mute)}
+
+.id{display:flex;flex-direction:column;gap:6px;text-align:center}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(46px,14vw,64px);line-height:.9;letter-spacing:.02em;text-transform:uppercase;margin:0;text-wrap:balance;
+  background:linear-gradient(180deg,#fff 30%,#9a9a96);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin:0;color:var(--mute);font-size:15px;line-height:1.5}
+.sub strong{color:var(--ink);font-weight:500}
+
+.btns{display:flex;flex-direction:column;gap:14px;perspective:800px}
+.btn{--rx:0deg;--ry:0deg;position:relative;display:flex;align-items:center;gap:16px;padding:16px 18px;border-radius:24px;text-decoration:none;color:var(--ink);
+  background:linear-gradient(135deg,var(--glass-hi),var(--glass) 55%);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.05),0 18px 40px -18px rgba(0,0,0,.9);
+  transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .25s ease,background .25s ease;overflow:hidden}
+.btn::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 48%,transparent 62%);
+  transform:translateX(-120%);animation:sheen 5.5s ease-in-out infinite}
+.btn:nth-child(2)::after{animation-delay:1.2s}
+@keyframes sheen{0%,60%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.btn:hover{background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.08) 55%)}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.ico{flex:none;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--ink);color:var(--bg);
+  box-shadow:inset 0 -3px 6px rgba(0,0,0,.25),0 6px 14px -6px rgba(255,255,255,.4)}
+.ico svg{width:28px;height:28px}
+.lbl{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.lbl b{font-size:18px;font-weight:700;letter-spacing:.01em}
+.lbl span{font-family:var(--mono);font-size:13px;color:var(--mute);overflow-wrap:anywhere}
+.arr{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center}
+.arr svg{width:14px;height:14px}
+
+.copy{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px 14px;border-radius:18px;border:1px solid var(--line);background:var(--glass);color:var(--ink);font:inherit;cursor:pointer;text-align:left;min-width:0;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.chip small{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.chip span{font-family:var(--mono);font-size:13px;user-select:all;overflow-wrap:anywhere}
+.chip:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chip.ok small{color:var(--ink)}
+.foot{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+
+.rise{animation:rise .9s cubic-bezier(.2,.8,.2,1) both}
+.d1{animation-delay:.15s}.d2{animation-delay:.3s}.d3{animation-delay:.45s}
+@keyframes rise{from{transform:translateY(14px);filter:blur(6px)}to{transform:none;filter:none}}
+@media (prefers-reduced-motion:reduce){.btn::after,.rise{animation:none}}
+.lang{align-self:center;display:inline-flex;padding:4px;gap:2px;border-radius:999px;border:1px solid var(--line);background:var(--glass);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.lang button{font:500 13px/1 var(--body);color:var(--mute);background:none;border:0;padding:9px 18px;border-radius:999px;cursor:pointer;letter-spacing:.04em;transition:background .25s,color .25s}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.lang button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+html[lang="th"] body,html[lang="th"] .sub,html[lang="th"] .lbl b{font-family:"IBM Plex Sans Thai",var(--body)}
+html[lang="th"] .chip small,html[lang="th"] .stage .tag,html[lang="th"] .stage .hint,html[lang="th"] .foot{font-family:"IBM Plex Sans Thai",var(--mono);letter-spacing:.02em}
+</style>
+
+</head>
+<body>
+<div class="bg"></div>
+<main class="wrap">
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" id="lang-en" data-l="en" aria-pressed="true">EN</button>
+    <button type="button" id="lang-th" data-l="th" aria-pressed="false">ไทย</button>
+  </div>
+
+  <section class="stage">
+    <canvas id="c" aria-label="3D model of famous Bangkok landmarks. Drag to rotate, pinch or scroll to zoom."></canvas>
+    <div class="tag" data-i="tag"><b>Bangkok</b> · Skyline</div>
+    <button class="reset" id="reset" type="button" aria-label="Reset view"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 8a5.5 5.5 0 1 0 1.6-3.9M2.5 2.5v3h3"/></svg></button>
+    <div class="hint" id="hint" data-i="hint">Drag to rotate · Pinch to zoom</div>
+  </section>
+
+  <header class="id rise d1">
+    <h1>Rich Agency</h1>
+    <p class="sub" data-i="sub">Condos for <strong>rent &amp; sale</strong> in Bangkok.<br>Message me and I’ll send you the best options.</p>
+  </header>
+
+  <nav class="btns rise d2" aria-label="Contact">
+    <a class="btn" href="https://wa.me/66918157214" target="_blank" rel="noopener">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2A9.7 9.7 0 0 0 3.7 16.9L2.3 21.8l5-1.3A9.7 9.7 0 1 0 12 2.2Zm0 17.7a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 19.9Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.2-2.8c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.6-.2Z"/></svg></span>
+      <span class="lbl"><b data-i="wa">Chat on WhatsApp</b><span>+66 91 815 7214</span></span>
+      <span class="arr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12 12 4M6 4h6v6"/></svg></span>
+    </a>
+    <a class="btn" href="https://line.me/ti/p/~Peji_org" target="_blank" rel="noopener">
+      <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3C6.5 3 2 6.6 2 11c0 4 3.5 7.3 8.3 7.9.3.1.8.2.9.5.1.3.1.7 0 1l-.1.9c0 .3-.2 1 .9.6 1.1-.5 6-3.6 8.2-6.1A7.4 7.4 0 0 0 22 11c0-4.4-4.5-8-10-8ZM8.4 13.4H6.4a.5.5 0 0 1-.5-.5V8.9a.5.5 0 0 1 1 0v3.5h1.5a.5.5 0 0 1 0 1Zm2-.5a.5.5 0 0 1-1 0V8.9a.5.5 0 0 1 1 0v4Zm4.8 0a.5.5 0 0 1-.9.3l-2-2.8v2.5a.5.5 0 0 1-1 0V8.9a.5.5 0 0 1 .9-.3l2 2.8V8.9a.5.5 0 0 1 1 0v4Zm3.2-2.5a.5.5 0 0 1 0 1h-1.5v1h1.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5V8.9c0-.3.2-.5.5-.5h2a.5.5 0 0 1 0 1h-1.5v1h1.5Z"/></svg></span>
+      <span class="lbl"><b data-i="line">Add me on LINE</b><span>@Peji_org</span></span>
+      <span class="arr"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12 12 4M6 4h6v6"/></svg></span>
+    </a>
+  </nav>
+
+  <div class="copy rise d3">
+    <button class="chip" id="cpWa" type="button" data-v="+66918157214"><small data-i="cpwa">Copy WhatsApp</small><span>+66918157214</span></button>
+    <button class="chip" id="cpLine" type="button" data-v="Peji_org"><small data-i="cpline">Copy LINE ID</small><span>Peji_org</span></button>
+  </div>
+
+  <p class="foot" data-i="foot">Bangkok · Sukhumvit · Sathorn · Rama 9</p>
+</main>
+
+<script>
+const I18N={
+  en:{tag:'<b>Bangkok</b> · Skyline',hint:'Drag to rotate · Pinch to zoom',sub:'Condos for <strong>rent &amp; sale</strong> in Bangkok.<br>Message me and I’ll send you the best options.',wa:'Chat on WhatsApp',line:'Add me on LINE',cpwa:'Copy WhatsApp',cpline:'Copy LINE ID',copied:'Copied',foot:'Bangkok · Sukhumvit · Sathorn · Rama 9'},
+  th:{tag:'<b>กรุงเทพฯ</b> · สกายไลน์',hint:'ลากเพื่อหมุน · ถ่างนิ้วเพื่อซูม',sub:'คอนโด<strong>ให้เช่าและขาย</strong>ในกรุงเทพฯ<br>ทักมาได้เลย ผมจะส่งห้องที่ดีที่สุดให้',wa:'แชทผ่าน WhatsApp',line:'เพิ่มเพื่อนทาง LINE',cpwa:'คัดลอก WhatsApp',cpline:'คัดลอก LINE ID',copied:'คัดลอกแล้ว',foot:'กรุงเทพฯ · สุขุมวิท · สาทร · พระราม 9'}
+};
+let LANG='en';
+function setLang(l){
+  LANG=l;document.documentElement.lang=l;
+  document.querySelectorAll('[data-i]').forEach(el=>{el.innerHTML=I18N[l][el.dataset.i]});
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.l===l)));
+  if(window.SKY) SKY.setLang(l);
+}
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
+
+document.querySelectorAll('.chip').forEach(b=>{
+  b.addEventListener('click',()=>{
+    const v=b.dataset.v,s=b.querySelector('small');
+    const done=()=>{b.classList.add('ok');s.textContent=I18N[LANG].copied;setTimeout(()=>{b.classList.remove('ok');s.innerHTML=I18N[LANG][s.dataset.i]},1600)};
+    try{navigator.clipboard.writeText(v).then(done,()=>sel(b))}catch(e){sel(b)}
+  });
+});
+function sel(b){const r=document.createRange();r.selectNodeContents(b.querySelector('span'));const g=getSelection();g.removeAllRanges();g.addRange(r)}
+
+document.querySelectorAll('.btn').forEach(el=>{
+  el.addEventListener('pointermove',e=>{const r=el.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;el.style.setProperty('--ry',(x*10)+'deg');el.style.setProperty('--rx',(-y*10)+'deg')});
+  el.addEventListener('pointerleave',()=>{el.style.setProperty('--ry','0deg');el.style.setProperty('--rx','0deg')});
+});
+
+/* 3D glass Bangkok landmarks — real heights (1 unit = 50 m). Drag to orbit, pinch / wheel to zoom */
+window.SKY=(()=>{
+  const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W=0,H=0,lang='en';
+  function size(){const d=Math.min(devicePixelRatio||1,2);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
+  size();addEventListener('resize',size);
+
+  const hash=(a,b,c)=>{const h=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5;return h-Math.floor(h)};
+  const PL=[],LN=[],LB=[],BEACONS=[];
+  let pid=0;
+  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+  const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+
+  /* group transform: place a building at (X,Z), scale s, rotate r */
+  let G={X:0,Z:0,s:1,c:1,n:0};
+  const grp=(X,Z,s=1,r=0)=>{G={X,Z,s,c:Math.cos(r),n:Math.sin(r)}};
+  const T=(x,y,z)=>[G.X+(x*G.c-z*G.n)*G.s,y*G.s,G.Z+(x*G.n+z*G.c)*G.s];
+
+  function poly(pts,ctr,o={}){
+    let n=crs(sub(pts[1],pts[0]),sub(pts[2],pts[0]));
+    if(Math.hypot(...n)<1e-9&&pts.length>3) n=crs(sub(pts[2],pts[0]),sub(pts[3],pts[0]));
+    const l=Math.hypot(...n)||1;n=n.map(v=>v/l);
+    const c=pts.reduce((a,p)=>[a[0]+p[0]/pts.length,a[1]+p[1]/pts.length,a[2]+p[2]/pts.length],[0,0,0]);
+    if(dot(n,sub(c,ctr))<0) n=n.map(v=>-v);
+    PL.push({pts,n,id:pid++,ymin:Math.min(...pts.map(p=>p[1])),...o});
+  }
+  const line=(a,b,al=.5,w=1)=>{const A=T(...a),B=T(...b);LN.push({a:A,b:B,al,w,ymin:Math.min(A[1],B[1])})};
+  const label=(x,y,z,en,th)=>LB.push({p:T(x,y,z),en,th});
+  const beacon=(x,y,z)=>BEACONS.push(T(x,y,z));
+
+  function prism(cx,cz,C,y0,y1,ts=1,o={}){
+    const sx=o.sx||0,sz=o.sz||0,n=C.length;
+    const ctr=T(cx+sx/2,(y0+y1)/2,cz+sz/2);
+    const B=C.map(([x,z])=>T(cx+x,y0,cz+z));
+    const U=C.map(([x,z])=>T(cx+sx+x*ts,y1,cz+sz+z*ts));
+    for(let i=0;i<n;i++){const j=(i+1)%n;poly([B[i],B[j],U[j],U[i]],ctr,{k:o.k||'glass',fi:i,fn:n,quad:1})}
+    if(o.top!==false&&ts>.02) poly(U,ctr,{k:o.tk||o.k||'glass',top:1});
+  }
+  const R=(w,d)=>[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];
+  const EL=(rx,rz,n)=>{const C=[];for(let i=0;i<n;i++){const a=(i+.5)/n*Math.PI*2;C.push([Math.cos(a)*rx,Math.sin(a)*rz])}return C};
+  const NOTCH=(w,d,k)=>{const a=w/2,b=d/2;return[[-a+k,-b],[a-k,-b],[a-k,-b+k],[a,-b+k],[a,b-k],[a-k,b-k],[a-k,b],[-a+k,b],[-a+k,b-k],[-a,b-k],[-a,-b+k],[-a+k,-b+k]]};
+  const OCT=(s,c)=>{const h=s/2;return[[-h+c,-h],[h-c,-h],[h,-h+c],[h,h-c],[h-c,h],[-h+c,h],[-h,h-c],[-h,-h+c]]};
+  const box=(cx,cz,w,d,y0,y1,o)=>prism(cx,cz,R(w,d),y0,y1,1,o);
+  const cyl=(cx,cz,r,n,y0,y1,ts,o)=>prism(cx,cz,EL(r,r,n),y0,y1,ts,o);
+  function gable(cx,cz,len,wid,y0,h,ax,o={}){
+    const L=len/2,Wd=wid/2;
+    const P=(a,b,y)=>ax==='x'?T(cx+a,y,cz+b):T(cx+b,y,cz+a);
+    const ctr=P(0,0,y0+h*.3),k=o.k||'roof';
+    poly([P(-L,-Wd,y0),P(L,-Wd,y0),P(L,0,y0+h),P(-L,0,y0+h)],ctr,{k});
+    poly([P(L,Wd,y0),P(-L,Wd,y0),P(-L,0,y0+h),P(L,0,y0+h)],ctr,{k});
+    poly([P(-L,-Wd,y0),P(-L,0,y0+h),P(-L,Wd,y0)],ctr,{k});
+    poly([P(L,-Wd,y0),P(L,Wd,y0),P(L,0,y0+h)],ctr,{k});
+    if(o.chofa){const Q=(a,b,y)=>ax==='x'?[cx+a,y,cz+b]:[cx+b,y,cz+a];
+      [-1,1].forEach(s=>line(Q(s*L,0,y0+h),Q(s*(L+.07),0,y0+h+.12),.85,1.1))}
+  }
+  function prang(cx,cz,y0,y1,r,tiers,n,bulge,o={}){
+    const f=t=>r*(bulge?Math.sin(Math.PI*(.5+t*.47))*(1-t*.5)+.08*(1-t):(1-t*.92));
+    for(let i=0;i<tiers;i++){const a=i/tiers,b=(i+1)/tiers,r0=f(a),r1=f(b),y=y0+(y1-y0)*a;
+      if(!o.nob) cyl(cx,cz,r0*1.07,n,y,y+(y1-y0)/tiers*.2,1,{k:'band',top:false});
+      cyl(cx,cz,r0,n,y,y0+(y1-y0)*b,r1/r0,{k:o.k||'solid'});}
+  }
+
+  /* ---------- King Power MahaNakhon (314 m) — pixel ribbon carved INTO the tower ---------- */
+  {grp(4.6,.9);
+   const NX=6,NZ=6,NY=40,cs=.17,ch=.15,ox=-NX*cs/2,oz=-NZ*cs/2;
+   const S=new Uint8Array(NX*NY*NZ).fill(1);
+   const id=(x,y,z)=>(y*NX+x)*NZ+z;
+   const P=[];for(let x=0;x<6;x++)P.push([x,0]);for(let z=1;z<6;z++)P.push([5,z]);for(let x=4;x>=0;x--)P.push([x,5]);for(let z=4;z>=1;z--)P.push([0,z]);
+   const inner=([x,z])=>[x===0?1:x===5?4:x,z===0?1:z===5?4:z];
+   const Y0=11;
+   for(let y=Y0;y<NY;y++){
+     const c=((y-Y0)/(NY-Y0))*21+2;
+     for(let p=0;p<20;p++){
+       let d=Math.abs(p-(c%20));d=Math.min(d,20-d);
+       const r=hash(y,p,1);
+       if(d<1.15||(d<2.2&&r>.5)||(d<3.1&&r>.84)){
+         const [x,z]=P[p];S[id(x,y,z)]=0;
+         if(d<.9&&r>.3){const [a,b]=inner(P[p]);S[id(a,y,b)]=0}
+       }
+     }
+   }
+   const at=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ&&S[id(x,y,z)];
+   const inb=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ;
+   const D=[NX,NY,NZ];
+   for(let a=0;a<3;a++){const u=(a+1)%3,v=(a+2)%3;
+     for(const sg of [1,-1]) for(let k=0;k<D[a];k++){
+       const M=new Int8Array(D[u]*D[v]);
+       for(let i=0;i<D[u];i++)for(let j=0;j<D[v];j++){
+         const p=[0,0,0];p[a]=k;p[u]=i;p[v]=j;
+         if(!at(...p))continue;
+         const q=[...p];q[a]+=sg;
+         if(at(...q))continue;
+         if(!inb(...q)&&a===1&&sg<0)continue;
+         M[i*D[v]+j]=inb(...q)?2:1;
+       }
+       for(let i=0;i<D[u];i++)for(let j=0;j<D[v];){
+         const c=M[i*D[v]+j];if(!c){j++;continue}
+         let w=1;while(j+w<D[v]&&M[i*D[v]+j+w]===c)w++;
+         let h=1;grow:while(i+h<D[u]){for(let m=0;m<w;m++)if(M[(i+h)*D[v]+j+m]!==c)break grow;h++}
+         for(let r=0;r<h;r++)for(let m=0;m<w;m++)M[(i+r)*D[v]+j+m]=0;
+         const pl=k+(sg>0?1:0);
+         const cor=(uu,vv)=>{const p=[0,0,0];p[a]=pl;p[u]=uu;p[v]=vv;return T(ox+p[0]*cs,p[1]*ch,oz+p[2]*cs)};
+         const cc=[0,0,0];cc[a]=pl-sg*.5;cc[u]=i+h/2;cc[v]=j+w/2;
+         poly([cor(i,j),cor(i+h,j),cor(i+h,j+w),cor(i,j+w)],T(ox+cc[0]*cs,cc[1]*ch,oz+cc[2]*cs),{k:c===1?(a===1?'gtop':'glassc'):'recess'});
+         j+=w;
+       }
+     }
+   }
+   [[0,0],[5,0],[5,5],[0,5]].forEach(([x,z])=>{
+     const wx=ox+(x?NX:0)*cs,wz=oz+(z?NZ:0)*cs;let s=-1;
+     for(let y=0;y<=NY;y++){const on=y<NY&&at(x,y,z);if(on&&s<0)s=y;if(!on&&s>=0){line([wx,s*ch,wz],[wx,y*ch,wz],.75,1);s=-1}}
+   });
+   P.forEach(([x,z])=>{if(!at(x,NY-1,z))return;
+     const x0=ox+x*cs,z0=oz+z*cs,y=NY*ch;
+     if(z===0)line([x0,y,z0],[x0+cs,y,z0],.7,1);if(z===5)line([x0,y,z0+cs],[x0+cs,y,z0+cs],.7,1);
+     if(x===0)line([x0,y,z0],[x0,y,z0+cs],.7,1);if(x===5)line([x0+cs,y,z0],[x0+cs,y,z0+cs],.7,1)});
+   box(0,0,.9,.9,6.0,6.18,{k:'glass'});
+   box(0,0,.94,.94,6.18,6.22,{k:'band'});
+   box(0,0,.5,.5,6.22,6.28,{k:'solid'});
+   beacon(0,6.34,0);
+   label(0,6.4,0,'MahaNakhon','มหานคร');}
+
+  /* ---------- Baiyoke Tower II (304 m roof) — stepped shaft, dark glass spine, rotating Thai-flag LED ring ---------- */
+  {grp(3.4,5.6);
+   prism(0,0,NOTCH(1.75,1.4,.16),0,.55);
+   prism(0,0,NOTCH(1.5,1.22,.15),.55,1.25);
+   prism(0,0,NOTCH(1.18,1.02,.13),1.25,2.45);
+   prism(0,0,NOTCH(1.0,.92,.12),2.45,4.35);
+   prism(0,0,NOTCH(.9,.84,.11),4.35,5.6);
+   box(0,0,.2,.95,2.6,5.6,{k:'dark'});
+   box(0,0,.94,.16,3.4,5.6,{k:'dark'});
+   [-1,1].forEach(s=>{cyl(0,s*.47,.13,4,2.42,2.72,.05,{k:'glow'});cyl(0,s*.44,.13,4,5.25,5.5,.05,{k:'glow'})});
+   box(0,0,.84,.8,5.6,5.68,{k:'band'});
+   cyl(0,0,.4,24,5.68,5.85,1,{k:'glass'});
+   cyl(0,0,.425,40,5.85,6.03,1,{k:'flag',top:false});
+   cyl(0,0,.41,24,6.03,6.08,1,{k:'band'});
+   for(let i=0;i<5;i++){const a=i/5*Math.PI/2,b=(i+1)/5*Math.PI/2,r0=.4*Math.cos(a),r1=Math.max(.02,.4*Math.cos(b));
+     cyl(0,0,r0,24,6.08+.24*Math.sin(a),6.08+.24*Math.sin(b),r1/r0,{k:'solid',top:i===4})}
+   cyl(0,0,.035,6,6.3,6.62,.4,{k:'solid'});
+   [6.42,6.52].forEach(y=>box(0,0,.16,.025,y,y+.02,{k:'band'}));
+   beacon(0,6.66,0);
+   label(0,6.75,0,'Baiyoke Tower II','ใบหยก 2');}
+
+  /* ---------- State Tower / lebua (247 m) ---------- */
+  {grp(2.4,-1.4,.906);
+   box(0,0,1.65,1.3,0,.85);
+   box(0,0,1.45,1.15,.85,1.2);
+   box(0,0,.95,.95,1.2,4.0);
+   for(let y=1.6;y<4;y+=.8) prism(0,0,OCT(1.04,.16),y,y+.04,1,{k:'band'});
+   box(0,0,1.06,1.06,4.0,4.1,{k:'band'});
+   cyl(0,0,.47,20,4.1,4.18,1,{k:'band'});
+   cyl(0,0,.33,20,4.18,4.5,1,{k:'glass',top:false});
+   for(let i=0;i<16;i++){const a=i/16*Math.PI*2;box(Math.cos(a)*.41,Math.sin(a)*.41,.035,.035,4.18,4.5,{k:'solid'})}
+   cyl(0,0,.47,20,4.5,4.56,1,{k:'band'});
+   const Rd=.42,K=7;
+   for(let i=0;i<K;i++){const a=i/K*Math.PI/2,b=(i+1)/K*Math.PI/2,r0=Rd*Math.cos(a),r1=Math.max(.03,Rd*Math.cos(b));
+     cyl(0,0,r0,20,4.56+Rd*Math.sin(a),4.56+Rd*Math.sin(b),r1/r0,{k:'glow',top:i===K-1})}
+   for(let m=0;m<10;m++){const t=m/10*Math.PI*2;let pv=null;for(let i=0;i<=6;i++){const a=i/6*Math.PI/2;const p=[Math.cos(t)*Rd*Math.cos(a)*1.01,4.56+Rd*Math.sin(a),Math.sin(t)*Rd*Math.cos(a)*1.01];if(pv)line(pv,p,.35,.8);pv=p}}
+   cyl(0,0,.07,10,4.98,5.08,1,{k:'solid'});
+   cyl(0,0,.025,6,5.08,5.45,.3,{k:'glow'});
+   label(0,5.55,0,'State Tower','สเตท ทาวเวอร์');}
+
+  /* ---------- ICONSIAM — terraced riverfront mall, sail roof, Magnolias (317 m) + Mandarin Oriental (270 m) ---------- */
+  {grp(-4.3,-3.6);
+   [[1.1,0,.3],[.85,.3,.55],[.6,.55,.8],[.35,.8,1.0]].forEach(([fx,y0,y1])=>{
+     const w=fx+1,cx=(fx-1)/2;
+     box(cx,0,w,4.4,y0,y1,{k:'glass'});
+     box(cx+.02,0,w+.04,4.46,y1-.02,y1+.01,{k:'band',top:false});});
+   box(1.3,0,.35,3.2,0,.05,{k:'solid'});
+   const N=16,xE=.3,xM=-.32,xB=-.95,Zs=[],E=[],M=[],B=[];
+   for(let i=0;i<=N;i++){const s=i/N,z=-2.0+3.9*s,he=1.05+1.2*Math.pow(s,2.4);
+     Zs.push(z);E.push([xE,he,z]);M.push([xM,he+.24-.06*s,z]);B.push([xB,he+.14,z]);}
+   const C=T(-.3,.95,0);
+   for(let i=0;i<N;i++){
+     poly([T(...E[i]),T(...E[i+1]),T(...M[i+1]),T(...M[i])],T(-.3,.95,Zs[i]),{k:'sail'});
+     poly([T(...M[i]),T(...M[i+1]),T(...B[i+1]),T(...B[i])],T(-.3,.95,Zs[i]),{k:'sail'});
+     poly([T(xE,1,Zs[i]),T(xE,1,Zs[i+1]),T(...E[i+1]),T(...E[i])],T(-.3,1,Zs[i]),{k:'glassc'});
+     poly([T(xB,1,Zs[i]),T(xB,1,Zs[i+1]),T(...B[i+1]),T(...B[i])],T(-.3,1,Zs[i]),{k:'glassc'});
+     line(E[i],M[i],.3,.7);line(M[i],B[i],.3,.7);
+     line(E[i],E[i+1],.95,1.6);line(B[i],B[i+1],.5,1);
+   }
+   const zN=Zs[N],tip=[xE+.12,E[N][1]+.38,zN+.28];
+   poly([T(xE,1,zN),T(...E[N]),T(...M[N]),T(...B[N]),T(xB,1,zN)],T(-.3,1.2,zN-.5),{k:'glassc'});
+   poly([T(xE,1,Zs[0]),T(...E[0]),T(...M[0]),T(...B[0]),T(xB,1,Zs[0])],T(-.3,1.1,Zs[0]+.5),{k:'glassc'});
+   poly([T(...E[N]),T(...tip),T(...M[N])],C,{k:'sail'});
+   line(E[N],tip,.95,1.6);line(tip,M[N],.6,1);
+   line([xE-.05,1,zN+.01],[xM,M[N][1]-.05,zN+.01],.85,1.2);line([xB+.05,1,zN+.01],[xM,M[N][1]-.05,zN+.01],.85,1.2);
+   // Magnolias Waterfront Residences
+   box(-1.95,-.7,.95,.8,0,5.7);
+   box(-2.0,-.7,.8,.74,5.7,6.0);
+   box(-2.03,-.7,.64,.64,6.0,6.2);
+   box(-2.05,-.7,.46,.52,6.2,6.34,{k:'glow'});
+   beacon(-2.05,6.4,-.7);
+   // Mandarin Oriental Residences
+   box(-1.95,1.2,.85,.72,0,5.15);
+   box(-1.98,1.2,.66,.6,5.15,5.4,{k:'glow'});
+   label(-.3,6.55,-.2,'ICONSIAM','ไอคอนสยาม');}
+
+  /* ---------- Bhumibol Bridge — diamond pylons with gold spires, cable fans ---------- */
+  {const xr=z=>-1.4+.12*z+.7*Math.sin(z*.45);
+   grp(xr(-7.2),-7.2);
+   box(0,0,9.2,.56,.84,.95,{k:'solid'});
+   [-1,1].forEach(s=>line([-4.6,1.0,s*.28],[4.6,1.0,s*.28],.4,.8));
+   for(let x=-4.2;x<=4.2;x+=.7){if(Math.abs(x)<1.2)continue;box(x,0,.1,.14,0,.84,{k:'solid'})}
+   [-2.2,2.2].forEach(px=>{
+     [-1,1].forEach(s=>{
+       prism(px,s*.14,R(.12,.12),0,.95,1,{k:'solid',sz:s*.3});
+       prism(px,s*.44,R(.12,.12),.95,2.25,1,{k:'solid',sz:-s*.44});});
+     box(px,0,.14,.95,.78,.86,{k:'solid'});
+     box(px,0,.16,.16,2.25,3.05,{k:'solid'});
+     cyl(px,0,.12,8,3.05,3.12,1,{k:'band'});
+     prang(px,0,3.12,3.32,.09,4,8,0,{k:'glow',nob:1});
+     cyl(px,0,.012,6,3.32,3.46,.3,{k:'glow'});
+     beacon(px,3.48,0);
+     for(let k=0;k<9;k++){const y=2.35+k*.08;[-1,1].forEach(dir=>[-1,1].forEach(sd=>{
+       line([px,y,0],[px+dir*(.35+k*.2),.96,sd*.27],.32,.6)}))}
+   });
+   label(0,3.75,0,'Bhumibol Bridge','สะพานภูมิพล');}
+
+  /* ---------- Wat Arun (≈80 m) ---------- */
+  {grp(-2.5,1.8,.49);
+   [[1.8,0,.2],[1.4,.2,.4],[1.05,.4,.6]].forEach(([s,a,b])=>box(0,0,s,s,a,b,{k:'solid'}));
+   [[0,-1],[1,0],[0,1],[-1,0]].forEach(([dx,dz])=>{
+     const o=.08,a=[dx*.9+(dz?o:0),0,dz*.9+(dx?o:0)],b=[dx*.52+(dz?o:0),.6,dz*.52+(dx?o:0)],a2=[dx*.9-(dz?o:0),0,dz*.9-(dx?o:0)],b2=[dx*.52-(dz?o:0),.6,dz*.52-(dx?o:0)];
+     line(a,b,.55,1);line(a2,b2,.55,1);
+     const mx=dx*.55+dz*.3,mz=dz*.55+dx*.3;
+     box(mx,mz,.14,.14,.6,.78,{k:'solid'});cyl(mx,mz,.11,4,.78,.98,.08,{k:'roof'});});
+   prang(0,0,.6,2.75,.4,10,12,1);
+   cyl(0,0,.045,8,2.75,2.95,.6,{k:'glow'});
+   cyl(0,0,.02,6,2.95,3.3,.3,{k:'glow'});
+   [[-.68,-.68],[.68,-.68],[.68,.68],[-.68,.68]].forEach(([dx,dz])=>{prang(dx,dz,.2,1.35,.17,6,8,1,{nob:1});cyl(dx,dz,.012,6,1.35,1.6,.3,{k:'glow'})});
+   label(0,3.45,0,'Wat Arun','วัดอรุณ');}
+
+  /* ---------- Grand Palace — Chakri Maha Prasat ---------- */
+  {grp(2.0,3.4,.45);
+   box(0,0,2.3,.6,0,.5);box(0,0,2.2,.56,.5,.8);
+   for(let i=0;i<=12;i++){const x=-1.15+i*2.3/12;line([x,0,-.31],[x,.5,-.31],.35,.8)}
+   box(0,-.05,.7,.8,0,.95);box(0,-.05,.78,.88,.95,1.0,{k:'band'});
+   gable(0,-.05,.9,.7,1.0,.32,'z',{chofa:1});gable(0,-.05,.8,.6,1.0,.3,'x',{chofa:1});
+   gable(0,-.05,.6,.5,1.14,.3,'z',{chofa:1});gable(0,-.05,.55,.42,1.14,.28,'x',{chofa:1});
+   prang(0,-.05,1.38,2.45,.15,8,8,0,{k:'roof'});cyl(0,-.05,.012,6,2.45,2.75,.3,{k:'glow'});
+   [-1,1].forEach(s=>{gable(s*.68,0,.75,.62,.8,.26,'x',{chofa:1});const px=s*.95;
+     box(px,0,.36,.42,.8,.98,{k:'solid'});gable(px,0,.48,.42,.98,.24,'z',{chofa:1});gable(px,0,.44,.38,.98,.22,'x',{chofa:1});
+     prang(px,0,1.16,1.85,.1,6,8,0,{k:'roof',nob:1});cyl(px,0,.01,6,1.85,2.05,.3,{k:'glow'})});
+   label(0,2.9,-.05,'Grand Palace','พระบรมมหาราชวัง');}
+
+  /* ---------- Wat Paknam — Big Buddha (69 m) + white Maha Chedi (80 m) ---------- */
+  {grp(-5.9,.7);
+   prism(0,0,EL(.55,.42,20),0,.1,1,{k:'band'});
+   prism(0,0,EL(.5,.38,20),.1,.18,1.06,{k:'solid'});
+   prism(0,-.06,EL(.46,.28,18),.18,.36,.88,{k:'solid'});
+   prism(0,.03,EL(.25,.17,16),.34,.78,1.2,{k:'solid'});
+   prism(0,.03,EL(.3,.2,16),.78,.86,.55,{k:'solid'});
+   cyl(0,.03,.075,10,.86,.91,1,{k:'solid'});
+   const hc=1.04,hr=.15;
+   for(let i=0;i<6;i++){const a=-Math.PI/2+i/6*Math.PI,b=-Math.PI/2+(i+1)/6*Math.PI,r0=Math.max(.04,hr*Math.cos(a)),r1=Math.max(.04,hr*Math.cos(b));
+     prism(0,.02,EL(r0,r0*1.05,14),hc+hr*Math.sin(a),hc+hr*Math.sin(b),r1/r0,{k:'glow',top:i===5})}
+   cyl(0,.03,.08,10,1.17,1.25,.6,{k:'glow'});
+   cyl(0,.03,.04,8,1.25,1.38,.05,{k:'glow'});
+   [-1,1].forEach(s=>{prism(s*.3,.04,EL(.06,.07,8),.42,.8,1,{k:'solid',sx:-s*.03});
+     box(s*.1,-.17,.18,.08,.36,.42,{k:'solid'});});
+   line([-.27,.8,-.14],[.2,.38,-.18],.6,1);
+   prism(-.7,1.9,OCT(1.0,.2),0,.25,1,{k:'solid'});
+   prism(-.7,1.9,OCT(.78,.16),.25,.45,1,{k:'solid'});
+   prism(-.7,1.9,OCT(.6,.12),.45,.6,1,{k:'solid'});
+   cyl(-.7,1.9,.27,16,.6,.95,.6,{k:'solid'});
+   prang(-.7,1.9,.95,1.45,.16,7,12,0,{k:'solid',nob:1});
+   cyl(-.7,1.9,.015,6,1.45,1.6,.3,{k:'glow'});
+   label(0,1.5,0,'Big Buddha · Wat Paknam','พระใหญ่วัดปากน้ำ');}
+
+  /* ---------- Robot Building (83 m) ---------- */
+  {grp(6.9,-2.8,.55);const F=-.43;
+   box(0,0,1.35,1.0,0,.22,{k:'dark'});
+   for(let i=0;i<7;i++){const x=-.6+i*.2;box(x,-.51,.12,.04,.04,.18,{k:'band'});box(x,.51,.12,.04,.04,.18,{k:'band'})}
+   box(0,0,1.2,.88,.22,1.15);box(0,.03,1.08,.86,1.15,1.75);box(0,.05,.96,.82,1.75,2.4);
+   [-.22,.22].forEach(dx=>{box(dx,F-.01,.28,.05,2.02,2.28,{k:'dark'});box(dx,F-.04,.09,.03,2.1,2.19,{k:'glow'});box(dx,F-.03,.3,.06,2.29,2.32,{k:'glow'})});
+   box(0,F-.01,.46,.05,1.86,1.92,{k:'dark'});
+   [-1,1].forEach(s=>[2.15,1.45,.7].forEach((y,i)=>cyl(s*(i===0?.53:i===1?.59:.65),0,.06,8,y,y+.1,1,{k:'solid'})));
+   [-.3,.3].forEach(dx=>{cyl(dx,.05,.03,6,2.4,2.95,1,{k:'solid'});cyl(dx,.05,.05,8,2.95,3.03,1,{k:'glow'})});
+   label(0,3.2,0,'Robot Building','ตึกหุ่นยนต์');}
+
+  /* ---------- Elephant Building (102 m) ---------- */
+  {grp(7.3,3.4,.58);const F=-.55;
+   [[-.45,0],[.45,0],[0,.6]].forEach(([dx,dz])=>{box(dx,dz,.46,.46,0,2.6);box(dx,dz,.52,.52,0,.12,{k:'band'})});
+   box(0,.25,1.5,1.25,2.6,3.25);box(0,.25,1.56,1.31,3.25,3.3,{k:'band'});box(0,.4,.5,.4,3.3,3.5,{k:'solid'});
+   box(0,F+.15,.78,.5,2.4,3.5);
+   [-1,1].forEach(s=>{box(s*.45,F+.22,.06,.5,2.55,3.35,{k:'glass'});box(s*.18,F-.11,.13,.04,3.12,3.24,{k:'dark'});cyl(s*.2,F-.08,.025,6,2.0,2.4,.6,{k:'glow',sz:-.12})});
+   box(0,F-.07,.15,.12,1.55,2.4,{k:'solid'});box(0,F-.12,.22,.18,1.55,1.66,{k:'solid'});
+   label(0,3.7,0,'Elephant Building','ตึกช้าง');}
+
+  const MAXH=6.7;
+  const xr=z=>-1.4+.12*z+.7*Math.sin(z*.45);
+
+  /* ---------- camera ---------- */
+  const home={yaw:-.28,pitch:.4,zoom:1};
+  let yaw=home.yaw,pitch=home.pitch,zoom=home.zoom,vYaw=0,vPitch=0,last=-1e9;
+  let cs,ss,cp,sp,K;
+  const TX=.4,TY=2.0,TZ=-.6,FOC=60;
+  function V(x,y,z){x-=TX;y-=TY;z-=TZ;const X=x*cs-z*ss;let Z=x*ss+z*cs;const Y=y*cp+Z*sp;Z=-y*sp+Z*cp;return[X,Y,Z]}
+  function Vn(n){const X=n[0]*cs-n[2]*ss;let Z=n[0]*ss+n[2]*cs;const Y=n[1]*cp+Z*sp;Z=-n[1]*sp+Z*cp;return[X,Y,Z]}
+  function S(v){const s=FOC/(FOC+v[2]);return[W/2+v[0]*s*K,H*.64-v[1]*s*K,v[2]]}
+  const P=(x,y,z)=>S(V(x,y,z));
+  const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+  function path(pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath()}
+  const LD=(()=>{const l=[-.5,.62,-.6],m=Math.hypot(...l);return l.map(v=>v/m)})();
+
+  /* ---------- input ---------- */
+  const ptr=new Map();let pinch=0;
+  const hint=document.getElementById('hint');
+  const touched=()=>{last=performance.now();hint.style.opacity=0};
+  const clampZ=z=>Math.max(.6,Math.min(6,z));
+  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});touched();vYaw=vPitch=0;
+    if(ptr.size===2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y)}});
+  cv.addEventListener('pointermove',e=>{
+    if(!ptr.has(e.pointerId))return;
+    const p=ptr.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;touched();
+    if(ptr.size===1){vYaw=dx*.008;vPitch=dy*.006;yaw+=vYaw;pitch=Math.max(-.05,Math.min(1.4,pitch+vPitch))}
+    else if(ptr.size===2){const [a,b]=[...ptr.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch)zoom=clampZ(zoom*d/pinch);pinch=d}
+  });
+  const up=e=>{ptr.delete(e.pointerId);pinch=0};
+  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{e.preventDefault();touched();zoom=clampZ(zoom*Math.exp(-e.deltaY*.0015))},{passive:false});
+  cv.addEventListener('dblclick',()=>reset());
+  function reset(){yaw=home.yaw;pitch=home.pitch;zoom=home.zoom;vYaw=vPitch=0;last=-1e9}
+  document.getElementById('reset').addEventListener('click',reset);
+
+  const FLAG=[[165,25,49],[244,245,248],[45,42,74],[45,42,74],[244,245,248],[165,25,49]];
+  const t0=performance.now();
+  function frame(now){
+    const t=(now-t0)/1000,idle=now-last;
+    if(ptr.size===0){
+      yaw+=vYaw;pitch=Math.max(-.05,Math.min(1.4,pitch+vPitch));vYaw*=.93;vPitch*=.9;
+      if(!reduce&&idle>2500) yaw+=.0022*Math.min(1,(idle-2500)/1500);
+    }
+    cs=Math.cos(yaw);ss=Math.sin(yaw);cp=Math.cos(pitch);sp=Math.sin(pitch);
+    K=Math.min(W/15.8,H/9.4)*zoom;
+    const bh=reduce?99:(t/2.8)*MAXH*1.05;
+    const cy=y=>Math.min(y,bh);
+    ctx.clearRect(0,0,W,H);ctx.lineJoin='round';
+
+    /* ground: circular street grid */
+    const RG=10;ctx.lineWidth=.8;ctx.strokeStyle='rgba(255,255,255,.05)';ctx.beginPath();
+    for(let g=-9;g<=9;g+=1.5){const h=Math.sqrt(RG*RG-g*g);let a=P(g,0,-h),b=P(g,0,h);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);a=P(-h,0,g);b=P(h,0,g);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}
+    ctx.stroke();
+    ctx.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;const p=P(Math.cos(a)*RG,0,Math.sin(a)*RG);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.strokeStyle='rgba(255,255,255,.16)';ctx.stroke();
+    if(!reduce){const rr=((t*.25)%1)*RG;ctx.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;const p=P(Math.cos(a)*rr,0,Math.sin(a)*rr);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.strokeStyle=`rgba(255,255,255,${.22*(1-rr/RG)})`;ctx.stroke()}
+
+    /* river: Chao Phraya */
+    const zs=[];for(let z=-9.2;z<=8.6;z+=.4)zs.push(z);
+    const L1=zs.map(z=>P(xr(z)-.75,0,z)),R1=zs.map(z=>P(xr(z)+.75,0,z));
+    path([...L1,...R1.reverse()]);ctx.fillStyle='rgba(255,255,255,.045)';ctx.fill();
+    [L1,R1].forEach(bk=>{ctx.beginPath();bk.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle='rgba(255,255,255,.28)';ctx.lineWidth=1;ctx.stroke()});
+    ctx.lineWidth=1;
+    for(let i=0;i<36;i++){const lane=(i%3-1)*.38,z=-9.2+((i*1.31+(reduce?0:t*.45))%17.6),z2=z+.35;
+      const a=P(xr(z)+lane,0,z),b=P(xr(z2)+lane,0,z2);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='rgba(255,255,255,.22)';ctx.stroke()}
+
+    /* collect + sort */
+    const D=[];
+    for(const p of PL){
+      if(p.ymin>=bh) continue;
+      const vs=p.pts.map(q=>V(q[0],cy(q[1]),q[2]));
+      const nv=Vn(p.n);
+      const c=vs.reduce((a,v)=>[a[0]+v[0]/vs.length,a[1]+v[1]/vs.length,a[2]+v[2]/vs.length],[0,0,0]);
+      const front=nv[0]*c[0]+nv[1]*c[1]+nv[2]*(c[2]+FOC)<0;
+      if(!front&&p.k!=='glass'&&p.k!=='glassc'&&p.k!=='sail') continue;
+      D.push({z:c[2],s:vs.map(S),p,front,lit:Math.max(0,dot(nv,LD))});
+    }
+    for(const l of LN){if(l.ymin>=bh)continue;const a=S(V(l.a[0],cy(l.a[1]),l.a[2])),b=S(V(l.b[0],cy(l.b[1]),l.b[2]));D.push({z:(a[2]+b[2])/2-.03,ln:[a,b],l})}
+    D.sort((a,b)=>b.z-a.z);
+
+    for(const d of D){
+      if(d.ln){ctx.beginPath();ctx.moveTo(d.ln[0][0],d.ln[0][1]);ctx.lineTo(d.ln[1][0],d.ln[1][1]);ctx.strokeStyle=`rgba(255,255,255,${d.l.al})`;ctx.lineWidth=d.l.w;ctx.stroke();continue}
+      const p=d.p,f=d.front,k=p.k,L=d.lit;
+      if(k==='flag'){
+        const [b1,b2,t2,t1]=d.s;
+        const ph=((p.fi/p.fn)+(reduce?0:t*.05))%1*5,q=ph-Math.floor(ph);
+        if(q>.93){path(d.s);ctx.fillStyle='rgba(10,10,12,.95)';ctx.fill();continue}
+        const wv=reduce?0:.045*Math.sin(q*Math.PI*3-t*3.2);
+        const br=.7+.3*L;
+        const cut=[0,1/6+wv,2/6+wv,4/6+wv,5/6+wv,1];
+        for(let s=0;s<5;s++){
+          const c=FLAG[s===2?2:s>2?s+1:s];
+          const y0=cut[s],y1=cut[s+1];
+          path([lerp(b1,t1,y0),lerp(b2,t2,y0),lerp(b2,t2,y1),lerp(b1,t1,y1)]);
+          ctx.fillStyle=`rgb(${c[0]*br|0},${c[1]*br|0},${c[2]*br|0})`;ctx.fill();
+        }
+        continue;
+      }
+      path(d.s);
+      if(k==='glassc'){ctx.fillStyle=`rgba(255,255,255,${f?.05+L*.2:.015})`;ctx.fill();continue}
+      if(k==='gtop'){ctx.fillStyle='rgba(255,255,255,.12)';ctx.fill();continue}
+      if(k==='sail'){ctx.fillStyle=`rgba(255,255,255,${f?.1+L*.32:.04})`;ctx.fill();continue}
+      if(k==='recess'){const g=12+L*55|0;ctx.fillStyle=`rgba(${g},${g},${g+2},.94)`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=.6;ctx.stroke();continue}
+      if(k==='dark'){ctx.fillStyle='rgba(6,6,8,.95)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=.6;ctx.stroke();continue}
+      if(k==='glow'){ctx.fillStyle=`rgba(255,255,255,${.35+L*.6})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=.6;ctx.stroke();continue}
+      if(k==='band'){ctx.fillStyle=`rgba(255,255,255,${.22+L*.4})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=.5;ctx.stroke();continue}
+      if(k==='solid'||k==='roof'){ctx.fillStyle=`rgba(${k==='roof'?'215,215,210':'255,255,255'},${.1+L*.34})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=.7;ctx.stroke();continue}
+      // glass prism faces
+      ctx.fillStyle=p.top?`rgba(255,255,255,${f?.1:.03})`:`rgba(255,255,255,${f?.05+L*.2:.015})`;ctx.fill();
+      ctx.strokeStyle=`rgba(255,255,255,${f?.7:.12})`;ctx.lineWidth=f?.9:.5;ctx.stroke();
+    }
+
+    /* beacons */
+    const blink=reduce?1:(Math.sin(t*3)>.2?1:.25);
+    BEACONS.forEach(([x,y,z],i)=>{if(bh<y-.2)return;const p=P(x,y,z);const r=8*Math.min(2,Math.sqrt(zoom));const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r);const b=i%2?1-blink*.6:blink;g.addColorStop(0,`rgba(255,255,255,${.9*b})`);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],r,0,7);ctx.fill()});
+
+    /* labels */
+    if(bh>MAXH*.92){
+      const a=Math.min(1,(bh-MAXH*.92)/1.2);
+      ctx.font=lang==='th'?'500 10.5px "IBM Plex Sans Thai", system-ui, sans-serif':'500 9.5px "JetBrains Mono", ui-monospace, monospace';ctx.textAlign='center';
+      LB.forEach(l=>{const [x,y,z]=l.p;const p=P(x,y,z),q=P(x,y+.3,z);
+        ctx.strokeStyle=`rgba(255,255,255,${.35*a})`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]-3);ctx.stroke();
+        const tx=lang==='th'?l.th:l.en.toUpperCase(),tw=ctx.measureText(tx).width+10,qx=Math.max(tw/2+4,Math.min(W-tw/2-4,q[0]));
+        ctx.fillStyle=`rgba(0,0,0,${.6*a})`;ctx.fillRect(qx-tw/2,q[1]-18,tw,14);
+        ctx.fillStyle=`rgba(255,255,255,${.92*a})`;ctx.fillText(tx,qx,q[1]-7)});
+    }
+
+    for(let i=0;i<60;i++){const x=(hash(i,1,2)-.5)*18,z=(hash(i,3,4)-.5)*16,y=(hash(i,5,6)*7+(reduce?0:t*.12))%7;const p=P(x,y,z);ctx.fillStyle=`rgba(255,255,255,${.1+hash(i,7,8)*.3})`;ctx.fillRect(p[0],p[1],1.3,1.3)}
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  return {setLang:l=>{lang=l}};
+})();
+
+</script>
+</body>
+</html>
