@@ -435,47 +435,8 @@ function drawFlag(t){
  lines(C,MAT.cable,g);
  label(g,0,3.75,0,'Bhumibol Bridge','สะพานภูมิพล');}
 
-/* ---------- Wat Paknam Big Buddha (enlarged on purpose: the largest figure in the scene) ---------- */
-{const g=grp(-3.4,11.5,6.4,0,1.15);const G=MAT.gold;
- /* lotus throne */
- cyl(.66,.62,0,.06,64,MAT.stone,g);
- const base=new THREE.Mesh(new THREE.CylinderGeometry(.6,.64,.06,64),G);base.scale.z=.78;base.position.y=.09;g.add(base);
- for(let i=0;i<26;i++){const a=i/26*Math.PI*2;const p=ellip(.06,.075,.025,Math.cos(a)*.6,.16,Math.sin(a)*.6*.78,G,g,{ws:12,hs:8});p.rotation.y=-a+Math.PI/2;p.rotation.x=-.35}
- for(let i=0;i<22;i++){const a=(i+.5)/22*Math.PI*2;const p=ellip(.055,.06,.022,Math.cos(a)*.54,.2,Math.sin(a)*.54*.78,G,g,{ws:12,hs:8});p.rotation.y=-a+Math.PI/2;p.rotation.x=-.25}
- /* crossed legs, knees, soles, hands in meditation */
- ellip(.56,.15,.34,0,.3,-.05,G,g);
- ellip(.15,.12,.17,-.42,.29,-.12,G,g);ellip(.15,.12,.17,.42,.29,-.12,G,g);
- ellip(.13,.035,.055,-.15,.4,-.17,G,g,{rot:[0,.5,.15]});ellip(.13,.035,.055,.17,.39,-.2,G,g,{rot:[0,-.4,-.1]});
- ellip(.15,.045,.085,0,.43,-.2,G,g);ellip(.13,.04,.075,0,.47,-.21,G,g);
- /* torso + robe */
- const torso=lathe([[0,.32],[.25,.33],[.26,.42],[.27,.55],[.295,.68],[.31,.75],[.29,.8],[.22,.85],[.1,.875],[0,.88]],48,G,g);torso.scale.z=.64;torso.position.z=.02;
- const robe=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[-.3,.8,.02],[-.18,.76,-.17],[0,.62,-.2],[.17,.48,-.19],[.26,.4,-.12]].map(p=>new THREE.Vector3(...p))),40,.028,10),G);g.add(robe);
- ellip(.12,.08,.16,-.27,.77,.02,G,g);
- const fold=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[-.25,.72,-.12],[-.28,.55,-.14],[-.3,.42,-.15]].map(p=>new THREE.Vector3(...p))),20,.018,8),G);g.add(fold);
- /* arms */
- [-1,1].forEach(s=>{capsule([s*.3,.76,.02],[s*.37,.5,-.05],.065,G,g);capsule([s*.37,.5,-.05],[s*.13,.42,-.19],.055,G,g)});
- /* neck + head */
- cyl(.08,.075,.86,.94,32,G,g);
- [.885,.91].forEach(y=>{const t=new THREE.Mesh(new THREE.TorusGeometry(.078,.006,8,32),G);t.rotation.x=Math.PI/2;t.position.y=y;g.add(t)});
- const HC=[0,1.05,0],HR=[.128,.152,.135];
- ellip(...HR,...HC,G,g,{ws:48,hs:32});
- ellip(.03,.022,.025,0,1.03,-.133,G,g);
- ellip(.05,.012,.02,0,.975,-.128,G,g);
- [-1,1].forEach(s=>{ellip(.022,.012,.012,s*.045,1.07,-.125,G,g);ellip(.02,.095,.04,s*.128,1.0,.005,G,g)});
- ellip(.11,.015,.08,0,1.115,-.07,G,g);
- /* snail-shell curls */
- const curl=new THREE.SphereGeometry(.017,10,8),pts=[];
- const fib=(n,keep,cx,cy,cz,rx,ry,rz)=>{for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),th=i*2.39996,x=Math.cos(th)*r,z=Math.sin(th)*r;if(keep(x,y,z))pts.push([cx+x*rx*1.04,cy+y*ry*1.04,cz+z*rz*1.04])}};
- fib(420,(x,y,z)=>y>(z<-.2?.48:.18),...HC,...HR);
- fib(90,(x,y,z)=>y>-.2,0,1.2,0,.085,.075,.085);
- const inst=new THREE.InstancedMesh(curl,G,pts.length);const m4=new THREE.Matrix4();pts.forEach((p,i)=>{m4.makeTranslation(...p);inst.setMatrixAt(i,m4)});g.add(inst);
- ellip(.085,.075,.085,0,1.2,0,G,g);
- lathe([[.045,1.26],[.05,1.29],[.04,1.33],[.025,1.37],[.01,1.41],[0,1.44]],24,MAT.glowGold,g);
- beacon(0,1.45,0,g,true);
- label(g,0,1.52,0,'Big Buddha · Wat Paknam','พระใหญ่วัดปากน้ำ');}
-
 /* ---------- camera & controls ---------- */
-const target=new THREE.Vector3(-.4,3.0,1.8);
+const target=new THREE.Vector3(.2,2.4,-.4);
 const controls=new OrbitControls(camera,canvas);
 controls.target.copy(target);controls.enableDamping=true;controls.dampingFactor=.075;controls.rotateSpeed=.6;controls.zoomSpeed=.9;
 controls.enablePan=false;controls.minDistance=6;controls.maxDistance=60;controls.minPolarAngle=.2;controls.maxPolarAngle=1.48;
