@@ -100,6 +100,9 @@ h1{font-family:var(--display);font-weight:800;font-size:clamp(46px,14vw,64px);li
 .lang button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 html[lang="th"] body,html[lang="th"] .sub,html[lang="th"] .lbl b{font-family:"IBM Plex Sans Thai",var(--body)}
 html[lang="th"] .chip small,html[lang="th"] .stage .tag,html[lang="th"] .stage .hint,html[lang="th"] .foot{font-family:"IBM Plex Sans Thai",var(--mono);letter-spacing:.02em}
+.lbl3d{position:absolute;left:0;top:0;transform:translate(-999px,-999px);font:500 9.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);padding:4px 7px;border-radius:5px;border:1px solid rgba(255,255,255,.18);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .5s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);will-change:transform}
+html[lang="th"] .lbl3d{font-family:"IBM Plex Sans Thai",var(--mono);font-size:10.5px;letter-spacing:.02em}
+.stage canvas{touch-action:none}
 </style>
 
 </head>
@@ -172,432 +175,349 @@ document.querySelectorAll('.btn').forEach(el=>{
   el.addEventListener('pointerleave',()=>{el.style.setProperty('--ry','0deg');el.style.setProperty('--rx','0deg')});
 });
 
-/* 3D glass Bangkok landmarks — real heights (1 unit = 50 m). Drag to orbit, pinch / wheel to zoom */
-window.SKY=(()=>{
-  const cv=document.getElementById('c'),ctx=cv.getContext('2d');
-  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let W=0,H=0,lang='en';
-  function size(){const d=Math.min(devicePixelRatio||1,2);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
-  size();addEventListener('resize',size);
+</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+import {mergeVertices} from 'three/addons/utils/BufferGeometryUtils.js';
 
-  const hash=(a,b,c)=>{const h=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5;return h-Math.floor(h)};
-  const PL=[],LN=[],LB=[],BEACONS=[];
-  let pid=0;
-  const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
-  const crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
-  const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+/* Bangkok skyline — Three.js. 1 unit = 50 m (Big Buddha deliberately enlarged). */
+const stage=document.querySelector('.stage'),canvas=document.getElementById('c');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.88;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+const BG=0x060607;
+const scene=new THREE.Scene();scene.background=new THREE.Color(BG);scene.fog=new THREE.Fog(BG,38,90);
+const pmrem=new THREE.PMREMGenerator(renderer);
+scene.environment=pmrem.fromScene(new RoomEnvironment(),.04).texture;
+const camera=new THREE.PerspectiveCamera(34,1,.1,300);
+scene.add(new THREE.HemisphereLight(0xffffff,0x050506,.3));
+const sun=new THREE.DirectionalLight(0xffffff,1.7);sun.position.set(-8,16,-12);scene.add(sun);
+const rim=new THREE.DirectionalLight(0xbcd0ff,.6);rim.position.set(10,6,14);scene.add(rim);
 
-  /* group transform: place a building at (X,Z), scale s, rotate r */
-  let G={X:0,Z:0,s:1,c:1,n:0};
-  const grp=(X,Z,s=1,r=0)=>{G={X,Z,s,c:Math.cos(r),n:Math.sin(r)}};
-  const T=(x,y,z)=>[G.X+(x*G.c-z*G.n)*G.s,y*G.s,G.Z+(x*G.n+z*G.c)*G.s];
+/* ---------- materials ---------- */
+const MAT={
+  glass:new THREE.MeshPhysicalMaterial({color:0xaab6c4,metalness:.4,roughness:.05,transparent:true,opacity:.2,envMapIntensity:1.5,clearcoat:1,clearcoatRoughness:.04,depthWrite:false,side:THREE.DoubleSide}),
+  glassHi:new THREE.MeshPhysicalMaterial({color:0xdfe6ee,metalness:.4,roughness:.08,transparent:true,opacity:.4,envMapIntensity:1.6,clearcoat:1,depthWrite:false,side:THREE.DoubleSide}),
+  dark:new THREE.MeshPhysicalMaterial({color:0x14181e,metalness:.7,roughness:.14,envMapIntensity:1.2,clearcoat:1,side:THREE.DoubleSide}),
+  stone:new THREE.MeshStandardMaterial({color:0xcfcfcc,roughness:.6,metalness:.08,envMapIntensity:.7}),
+  stoneFlat:new THREE.MeshStandardMaterial({color:0xdcdcd8,roughness:.55,metalness:.1,flatShading:true,envMapIntensity:.7}),
+  gold:new THREE.MeshStandardMaterial({color:0xe0b25a,metalness:1,roughness:.24,envMapIntensity:1.5}),
+  goldFlat:new THREE.MeshStandardMaterial({color:0xe0b25a,metalness:1,roughness:.3,envMapIntensity:1.5,flatShading:true}),
+  glow:new THREE.MeshBasicMaterial({color:0xffffff}),
+  glowGold:new THREE.MeshBasicMaterial({color:0xffd27a}),
+  edge:new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.6}),
+  edgeSoft:new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.22}),
+  edgeGold:new THREE.LineBasicMaterial({color:0xffcf6e}),
+  cable:new THREE.LineBasicMaterial({color:0xf2c96b,transparent:true,opacity:.55}),
+};
 
-  function poly(pts,ctr,o={}){
-    let n=crs(sub(pts[1],pts[0]),sub(pts[2],pts[0]));
-    if(Math.hypot(...n)<1e-9&&pts.length>3) n=crs(sub(pts[2],pts[0]),sub(pts[3],pts[0]));
-    const l=Math.hypot(...n)||1;n=n.map(v=>v/l);
-    const c=pts.reduce((a,p)=>[a[0]+p[0]/pts.length,a[1]+p[1]/pts.length,a[2]+p[2]/pts.length],[0,0,0]);
-    if(dot(n,sub(c,ctr))<0) n=n.map(v=>-v);
-    PL.push({pts,n,id:pid++,ymin:Math.min(...pts.map(p=>p[1])),...o});
+/* ---------- helpers ---------- */
+const BUILD=[],LABELS=[],BEACONS=[];
+function grp(x,z,s=1,ry=0,delay=0){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=ry;g.scale.y=reduce?1:.001;scene.add(g);const inner=new THREE.Group();inner.scale.setScalar(s);g.add(inner);BUILD.push({g,delay});inner.userData.root=g;return inner}
+function edges(geo,parent,mat=MAT.edge,th=28){const l=new THREE.LineSegments(new THREE.EdgesGeometry(geo,th),mat);parent.add(l);return l}
+function mesh(geo,mat,parent,edge=MAT.edge,th=28){const m=new THREE.Mesh(geo,mat);parent.add(m);if(edge)edges(geo,parent,edge,th);return m}
+function ext(shape,y0,y1,x=0,z=0){const g=new THREE.ExtrudeGeometry(shape,{depth:y1-y0,bevelEnabled:false,curveSegments:10});g.rotateX(-Math.PI/2);g.translate(x,y0,z);return g}
+const shp=pts=>{const s=new THREE.Shape();pts.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();return s};
+const rectS=(w,d)=>shp([[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]]);
+const notchS=(w,d,k)=>{const a=w/2,b=d/2;return shp([[-a+k,-b],[a-k,-b],[a-k,-b+k],[a,-b+k],[a,b-k],[a-k,b-k],[a-k,b],[-a+k,b],[-a+k,b-k],[-a,b-k],[-a,-b+k],[-a+k,-b+k]])};
+const roundS=(w,d,r)=>{const s=new THREE.Shape(),a=w/2,b=d/2;s.moveTo(-a+r,-b);s.lineTo(a-r,-b);s.quadraticCurveTo(a,-b,a,-b+r);s.lineTo(a,b-r);s.quadraticCurveTo(a,b,a-r,b);s.lineTo(-a+r,b);s.quadraticCurveTo(-a,b,-a,b-r);s.lineTo(-a,-b+r);s.quadraticCurveTo(-a,-b,-a+r,-b);return s};
+function box(w,h,d,x,y,z,mat,parent,edge=MAT.edge){const g=new THREE.BoxGeometry(w,h,d);g.translate(x,y+h/2,z);return mesh(g,mat,parent,edge)}
+function frustum(w,d,y0,y1,ts,mat,parent,{x=0,z=0,sx=0,sz=0,edge=MAT.edge}={}){
+  const g=new THREE.BoxGeometry(w,y1-y0,d);const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){if(p.getY(i)>0){p.setX(i,p.getX(i)*ts+sx);p.setZ(i,p.getZ(i)*ts+sz)}}
+  g.computeVertexNormals();g.translate(x,y0+(y1-y0)/2,z);return mesh(g,mat,parent,edge)}
+function cyl(r0,r1,y0,y1,seg,mat,parent,{x=0,z=0,open=false,edge=null}={}){const g=new THREE.CylinderGeometry(r1,r0,y1-y0,seg,1,open);g.translate(x,y0+(y1-y0)/2,z);return mesh(g,mat,parent,edge)}
+function lathe(pts,seg,mat,parent,{x=0,z=0,edge=null}={}){const g=new THREE.LatheGeometry(pts.map(([r,y])=>new THREE.Vector2(Math.max(r,.0005),y)),seg);g.translate(x,0,z);return mesh(g,mat,parent,edge)}
+function ellip(rx,ry,rz,x,y,z,mat,parent,{rot=null,ws=40,hs=24}={}){const m=new THREE.Mesh(new THREE.SphereGeometry(1,ws,hs),mat);m.scale.set(rx,ry,rz);m.position.set(x,y,z);if(rot)m.rotation.set(...rot);parent.add(m);return m}
+function beam(a,b,r,mat,parent,r2=r,seg=10){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const g=new THREE.CylinderGeometry(r2,r,A.distanceTo(B),seg);const m=new THREE.Mesh(g,mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());parent.add(m);return m}
+function capsule(a,b,r,mat,parent){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const g=new THREE.CapsuleGeometry(r,A.distanceTo(B),8,16);const m=new THREE.Mesh(g,mat);m.position.copy(A).add(B).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize());parent.add(m);return m}
+function lines(pairs,mat,parent){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pairs.flat(2),3));const l=new THREE.LineSegments(g,mat);parent.add(l);return l}
+function polyline(pts,mat,parent){const g=new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));const l=new THREE.Line(g,mat);parent.add(l);return l}
+function beacon(x,y,z,parent,gold=false){const m=new THREE.Mesh(new THREE.SphereGeometry(.05,12,8),gold?MAT.glowGold.clone():MAT.glow.clone());m.position.set(x,y,z);parent.add(m);BEACONS.push(m);return m}
+function label(parent,x,y,z,en,th){const el=document.createElement('div');el.className='lbl3d';el.textContent=en;stage.appendChild(el);LABELS.push({el,parent,p:new THREE.Vector3(x,y,z),en,th})}
+const hash=(a,b,c)=>{const h=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5;return h-Math.floor(h)};
+const xr=z=>-1.6+.1*z+.7*Math.sin(z*.4);
+
+/* ---------- ground & river ---------- */
+{const g=new THREE.Mesh(new THREE.CircleGeometry(22,96),new THREE.MeshStandardMaterial({color:0x050506,roughness:1,envMapIntensity:.15}));g.rotation.x=-Math.PI/2;g.position.y=-.01;scene.add(g);
+ const grid=new THREE.GridHelper(44,44,0x1d1d21,0x111114);grid.position.y=0;scene.add(grid);
+ const ring=new THREE.Mesh(new THREE.RingGeometry(21.9,22,128),new THREE.MeshBasicMaterial({color:0x333338}));ring.rotation.x=-Math.PI/2;ring.position.y=.005;scene.add(ring);}
+let flowTex;
+{const N=120,W=1.5,pos=[],uv=[],idx=[];
+ for(let i=0;i<=N;i++){const z=-16+32*i/N,x=xr(z);pos.push(x-W/2,.02,z,x+W/2,.02,z);uv.push(0,i/N*8,1,i/N*8);if(i<N){const a=i*2;idx.push(a,a+2,a+1,a+1,a+2,a+3)}}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+ scene.add(new THREE.Mesh(g,new THREE.MeshPhysicalMaterial({color:0x0e1218,metalness:.9,roughness:.12,envMapIntensity:1.1})));
+ const c=document.createElement('canvas');c.width=64;c.height=256;const x=c.getContext('2d');
+ for(let i=0;i<14;i++){x.fillStyle=`rgba(255,255,255,${.25+Math.random()*.4})`;x.fillRect(6+Math.random()*52,Math.random()*256,1.5,10+Math.random()*24)}
+ flowTex=new THREE.CanvasTexture(c);flowTex.wrapS=flowTex.wrapT=THREE.RepeatWrapping;
+ const f=new THREE.Mesh(g.clone(),new THREE.MeshBasicMaterial({map:flowTex,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending}));f.position.y=.01;scene.add(f);
+ const bank=s=>{const pts=[];for(let i=0;i<=N;i++){const z=-16+32*i/N;pts.push([xr(z)+s*W/2,.03,z])}return pts};
+ polyline(bank(-1),MAT.edgeSoft,scene);polyline(bank(1),MAT.edgeSoft,scene);}
+
+/* ---------- King Power MahaNakhon (314 m): pixel ribbon carved into the tower ---------- */
+{const g=grp(4.8,1.2,1,0,.15);
+ const NX=8,NZ=8,NY=60,cs=1/8,ch=.1,ox=-.5,oz=-.5;
+ const S=new Uint8Array(NX*NY*NZ).fill(1),id=(x,y,z)=>(y*NX+x)*NZ+z;
+ const P=[];for(let x=0;x<8;x++)P.push([x,0]);for(let z=1;z<8;z++)P.push([7,z]);for(let x=6;x>=0;x--)P.push([x,7]);for(let z=6;z>=1;z--)P.push([0,z]);
+ const inner=([x,z])=>[x===0?1:x===7?6:x,z===0?1:z===7?6:z];
+ const Y0=18,NP=P.length;
+ for(let y=Y0;y<NY;y++){const c=((y-Y0)/(NY-Y0))*(NP+1)+4;
+   for(let p=0;p<NP;p++){let d=Math.abs(p-(c%NP));d=Math.min(d,NP-d);const r=hash(y,p,1);
+     if(d<1.6||(d<2.9&&r>.5)||(d<3.9&&r>.85)){const [x,z]=P[p];S[id(x,y,z)]=0;if(d<1.1&&r>.3){const [a,b]=inner(P[p]);S[id(a,y,b)]=0}}}}
+ const at=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ&&S[id(x,y,z)];
+ const inb=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ;
+ const D=[NX,NY,NZ],OUT=[],REC=[];
+ for(let a=0;a<3;a++){const u=(a+1)%3,v=(a+2)%3;
+   for(const sg of [1,-1])for(let k=0;k<D[a];k++){
+     const M=new Int8Array(D[u]*D[v]);
+     for(let i=0;i<D[u];i++)for(let j=0;j<D[v];j++){const p=[0,0,0];p[a]=k;p[u]=i;p[v]=j;if(!at(...p))continue;const q=[...p];q[a]+=sg;if(at(...q))continue;if(!inb(...q)&&a===1&&sg<0)continue;M[i*D[v]+j]=inb(...q)?2:1}
+     for(let i=0;i<D[u];i++)for(let j=0;j<D[v];){const c=M[i*D[v]+j];if(!c){j++;continue}
+       let w=1;while(j+w<D[v]&&M[i*D[v]+j+w]===c)w++;
+       let h=1;grow:while(i+h<D[u]){for(let m=0;m<w;m++)if(M[(i+h)*D[v]+j+m]!==c)break grow;h++}
+       for(let r=0;r<h;r++)for(let m=0;m<w;m++)M[(i+r)*D[v]+j+m]=0;
+       const pl=k+(sg>0?1:0);
+       const cor=(uu,vv)=>{const p=[0,0,0];p[a]=pl;p[u]=uu;p[v]=vv;return[ox+p[0]*cs,p[1]*ch,oz+p[2]*cs]};
+       let q=[cor(i,j),cor(i+h,j),cor(i+h,j+w),cor(i,j+w)];if(sg<0)q=[q[0],q[3],q[2],q[1]];
+       (c===1?OUT:REC).push(q[0],q[1],q[2],q[0],q[2],q[3]);j+=w;}
+   }}
+ const geo=arr=>{const g2=new THREE.BufferGeometry();g2.setAttribute('position',new THREE.Float32BufferAttribute(arr.flat(),3));g2.computeVertexNormals();return g2};
+ g.add(new THREE.Mesh(geo(OUT),MAT.glass));
+ const rg=geo(REC);g.add(new THREE.Mesh(rg,MAT.dark));
+ edges(mergeVertices(rg,1e-4),g,MAT.edgeSoft,1);
+ const L=[];
+ [[0,0],[7,0],[7,7],[0,7]].forEach(([x,z])=>{const wx=ox+(x?NX:0)*cs,wz=oz+(z?NZ:0)*cs;let s=-1;
+   for(let y=0;y<=NY;y++){const on=y<NY&&at(x,y,z);if(on&&s<0)s=y;if(!on&&s>=0){L.push([[wx,s*ch,wz],[wx,y*ch,wz]]);s=-1}}});
+ P.forEach(([x,z])=>{if(!at(x,NY-1,z))return;const x0=ox+x*cs,z0=oz+z*cs,y=NY*ch;
+   if(z===0)L.push([[x0,y,z0],[x0+cs,y,z0]]);if(z===7)L.push([[x0,y,z0+cs],[x0+cs,y,z0+cs]]);
+   if(x===0)L.push([[x0,y,z0],[x0,y,z0+cs]]);if(x===7)L.push([[x0+cs,y,z0],[x0+cs,y,z0+cs]])});
+ lines(L,MAT.edge,g);
+ box(.92,.2,.92,0,6.0,0,MAT.glassHi,g);
+ box(.96,.03,.96,0,6.2,0,MAT.glow,g,null);
+ box(.4,.06,.4,0,6.23,0,MAT.stone,g);
+ beacon(0,6.34,0,g);
+ label(g,0,6.5,0,'MahaNakhon','มหานคร');}
+
+/* ---------- Baiyoke Tower II (304 m): stepped shaft, dark spine, rotating Thai-flag LED ring ---------- */
+let flagTex,flagCtx;
+{const g=grp(4.4,6.0,1,0,.3);
+ [[1.75,1.4,.16,0,.55],[1.5,1.22,.15,.55,1.25],[1.18,1.02,.13,1.25,2.45],[1.0,.92,.12,2.45,4.35],[.9,.84,.11,4.35,5.6]]
+   .forEach(([w,d,k,a,b])=>mesh(ext(notchS(w,d,k),a,b),MAT.glass,g));
+ box(.2,3.0,.94,0,2.6,0,MAT.dark,g,MAT.edgeSoft);
+ box(.92,2.2,.15,0,3.4,0,MAT.dark,g,MAT.edgeSoft);
+ [-1,1].forEach(s=>{const c=new THREE.Mesh(new THREE.ConeGeometry(.15,.32,4,1),MAT.goldFlat);c.rotation.y=Math.PI/4;c.position.set(0,2.6,s*.48);g.add(c);
+   const c2=c.clone();c2.position.set(0,5.42,s*.43);c2.scale.setScalar(.8);g.add(c2)});
+ box(.86,.08,.82,0,5.6,0,MAT.stone,g);
+ cyl(.4,.4,5.68,5.85,40,MAT.dark,g,{edge:MAT.edgeSoft});
+ const c=document.createElement('canvas');c.width=1024;c.height=96;flagCtx=c.getContext('2d');
+ flagTex=new THREE.CanvasTexture(c);flagTex.colorSpace=THREE.SRGBColorSpace;flagTex.wrapS=THREE.RepeatWrapping;flagTex.anisotropy=4;
+ const ring=new THREE.Mesh(new THREE.CylinderGeometry(.43,.43,.2,96,1,true),new THREE.MeshBasicMaterial({map:flagTex,toneMapped:false,side:THREE.DoubleSide}));
+ ring.position.y=5.95;g.add(ring);
+ [5.85,6.05].forEach(y=>{const t=new THREE.Mesh(new THREE.TorusGeometry(.435,.008,8,96),MAT.glow);t.rotation.x=Math.PI/2;t.position.y=y;g.add(t)});
+ cyl(.41,.41,6.05,6.1,40,MAT.stone,g);
+ const dome=new THREE.Mesh(new THREE.SphereGeometry(.41,48,24,0,Math.PI*2,0,Math.PI/2),MAT.gold);dome.scale.y=.55;dome.position.y=6.1;g.add(dome);
+ cyl(.04,.02,6.3,6.68,10,MAT.stone,g);
+ [6.42,6.53].forEach(y=>box(.18,.02,.02,0,y,0,MAT.stone,g,null));
+ beacon(0,6.7,0,g);
+ label(g,0,6.85,0,'Baiyoke Tower II','ใบหยก 2');}
+function drawFlag(t){
+  const x=flagCtx,W=1024,H=96,n=4,cols=[ '#a51931','#f4f5f8','#2d2a4a','#f4f5f8','#a51931'],cut=[0,1,2,4,5,6];
+  x.fillStyle='#050507';x.fillRect(0,0,W,H);
+  for(let px=0;px<W;px+=2){
+    const q=((px/W)*n+t*.18)%1;if(q>.94)continue;
+    const wv=Math.sin(q*Math.PI*2*1.2-t*3.2)*H*.05,sh=1-.18*(.5+.5*Math.sin(q*Math.PI*2*1.2-t*3.2+1.2));
+    for(let s=0;s<5;s++){const y0=cut[s]/6*H+(s?wv:0),y1=cut[s+1]/6*H+(s<4?wv:0);x.fillStyle=cols[s];x.globalAlpha=sh;x.fillRect(px,y0,2.2,y1-y0)}
+    x.globalAlpha=1;
   }
-  const line=(a,b,al=.5,w=1)=>{const A=T(...a),B=T(...b);LN.push({a:A,b:B,al,w,ymin:Math.min(A[1],B[1])})};
-  const label=(x,y,z,en,th)=>LB.push({p:T(x,y,z),en,th});
-  const beacon=(x,y,z)=>BEACONS.push(T(x,y,z));
+  flagTex.needsUpdate=true;
+}
 
-  function prism(cx,cz,C,y0,y1,ts=1,o={}){
-    const sx=o.sx||0,sz=o.sz||0,n=C.length;
-    const ctr=T(cx+sx/2,(y0+y1)/2,cz+sz/2);
-    const B=C.map(([x,z])=>T(cx+x,y0,cz+z));
-    const U=C.map(([x,z])=>T(cx+sx+x*ts,y1,cz+sz+z*ts));
-    for(let i=0;i<n;i++){const j=(i+1)%n;poly([B[i],B[j],U[j],U[i]],ctr,{k:o.k||'glass',fi:i,fn:n,quad:1})}
-    if(o.top!==false&&ts>.02) poly(U,ctr,{k:o.tk||o.k||'glass',top:1});
-  }
-  const R=(w,d)=>[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]];
-  const EL=(rx,rz,n)=>{const C=[];for(let i=0;i<n;i++){const a=(i+.5)/n*Math.PI*2;C.push([Math.cos(a)*rx,Math.sin(a)*rz])}return C};
-  const NOTCH=(w,d,k)=>{const a=w/2,b=d/2;return[[-a+k,-b],[a-k,-b],[a-k,-b+k],[a,-b+k],[a,b-k],[a-k,b-k],[a-k,b],[-a+k,b],[-a+k,b-k],[-a,b-k],[-a,-b+k],[-a+k,-b+k]]};
-  const OCT=(s,c)=>{const h=s/2;return[[-h+c,-h],[h-c,-h],[h,-h+c],[h,h-c],[h-c,h],[-h+c,h],[-h,h-c],[-h,-h+c]]};
-  const box=(cx,cz,w,d,y0,y1,o)=>prism(cx,cz,R(w,d),y0,y1,1,o);
-  const cyl=(cx,cz,r,n,y0,y1,ts,o)=>prism(cx,cz,EL(r,r,n),y0,y1,ts,o);
-  function gable(cx,cz,len,wid,y0,h,ax,o={}){
-    const L=len/2,Wd=wid/2;
-    const P=(a,b,y)=>ax==='x'?T(cx+a,y,cz+b):T(cx+b,y,cz+a);
-    const ctr=P(0,0,y0+h*.3),k=o.k||'roof';
-    poly([P(-L,-Wd,y0),P(L,-Wd,y0),P(L,0,y0+h),P(-L,0,y0+h)],ctr,{k});
-    poly([P(L,Wd,y0),P(-L,Wd,y0),P(-L,0,y0+h),P(L,0,y0+h)],ctr,{k});
-    poly([P(-L,-Wd,y0),P(-L,0,y0+h),P(-L,Wd,y0)],ctr,{k});
-    poly([P(L,-Wd,y0),P(L,Wd,y0),P(L,0,y0+h)],ctr,{k});
-    if(o.chofa){const Q=(a,b,y)=>ax==='x'?[cx+a,y,cz+b]:[cx+b,y,cz+a];
-      [-1,1].forEach(s=>line(Q(s*L,0,y0+h),Q(s*(L+.07),0,y0+h+.12),.85,1.1))}
-  }
-  function prang(cx,cz,y0,y1,r,tiers,n,bulge,o={}){
-    const f=t=>r*(bulge?Math.sin(Math.PI*(.5+t*.47))*(1-t*.5)+.08*(1-t):(1-t*.92));
-    for(let i=0;i<tiers;i++){const a=i/tiers,b=(i+1)/tiers,r0=f(a),r1=f(b),y=y0+(y1-y0)*a;
-      if(!o.nob) cyl(cx,cz,r0*1.07,n,y,y+(y1-y0)/tiers*.2,1,{k:'band',top:false});
-      cyl(cx,cz,r0,n,y,y0+(y1-y0)*b,r1/r0,{k:o.k||'solid'});}
-  }
+/* ---------- State Tower / lebua (247 m) ---------- */
+{const g=grp(2.6,-1.6,.906,0,.45);
+ mesh(ext(roundS(1.65,1.3,.18),0,.85),MAT.glass,g);
+ mesh(ext(roundS(1.45,1.15,.16),.85,1.2),MAT.glass,g);
+ mesh(ext(roundS(.95,.95,.24),1.2,4.0),MAT.glass,g);
+ mesh(ext(roundS(1.04,1.04,.26),4.0,4.1),MAT.stone,g);
+ cyl(.47,.47,4.1,4.18,48,MAT.stone,g);
+ cyl(.33,.33,4.18,4.5,40,MAT.glassHi,g,{open:true});
+ for(let i=0;i<16;i++){const a=i/16*Math.PI*2;cyl(.022,.022,4.18,4.5,8,MAT.stone,g,{x:Math.cos(a)*.41,z:Math.sin(a)*.41})}
+ cyl(.47,.47,4.5,4.56,48,MAT.stone,g);
+ const dome=new THREE.Mesh(new THREE.SphereGeometry(.42,48,24,0,Math.PI*2,0,Math.PI/2),MAT.gold);dome.position.y=4.56;g.add(dome);
+ cyl(.07,.07,4.97,5.08,16,MAT.gold,g);
+ cyl(.025,.004,5.08,5.45,8,MAT.gold,g);
+ beacon(0,5.46,0,g,true);
+ label(g,0,5.6,0,'State Tower','สเตท ทาวเวอร์');}
 
-  /* ---------- King Power MahaNakhon (314 m) — pixel ribbon carved INTO the tower ---------- */
-  {grp(4.6,.9);
-   const NX=6,NZ=6,NY=40,cs=.17,ch=.15,ox=-NX*cs/2,oz=-NZ*cs/2;
-   const S=new Uint8Array(NX*NY*NZ).fill(1);
-   const id=(x,y,z)=>(y*NX+x)*NZ+z;
-   const P=[];for(let x=0;x<6;x++)P.push([x,0]);for(let z=1;z<6;z++)P.push([5,z]);for(let x=4;x>=0;x--)P.push([x,5]);for(let z=4;z>=1;z--)P.push([0,z]);
-   const inner=([x,z])=>[x===0?1:x===5?4:x,z===0?1:z===5?4:z];
-   const Y0=11;
-   for(let y=Y0;y<NY;y++){
-     const c=((y-Y0)/(NY-Y0))*21+2;
-     for(let p=0;p<20;p++){
-       let d=Math.abs(p-(c%20));d=Math.min(d,20-d);
-       const r=hash(y,p,1);
-       if(d<1.15||(d<2.2&&r>.5)||(d<3.1&&r>.84)){
-         const [x,z]=P[p];S[id(x,y,z)]=0;
-         if(d<.9&&r>.3){const [a,b]=inner(P[p]);S[id(a,y,b)]=0}
-       }
-     }
-   }
-   const at=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ&&S[id(x,y,z)];
-   const inb=(x,y,z)=>x>=0&&x<NX&&y>=0&&y<NY&&z>=0&&z<NZ;
-   const D=[NX,NY,NZ];
-   for(let a=0;a<3;a++){const u=(a+1)%3,v=(a+2)%3;
-     for(const sg of [1,-1]) for(let k=0;k<D[a];k++){
-       const M=new Int8Array(D[u]*D[v]);
-       for(let i=0;i<D[u];i++)for(let j=0;j<D[v];j++){
-         const p=[0,0,0];p[a]=k;p[u]=i;p[v]=j;
-         if(!at(...p))continue;
-         const q=[...p];q[a]+=sg;
-         if(at(...q))continue;
-         if(!inb(...q)&&a===1&&sg<0)continue;
-         M[i*D[v]+j]=inb(...q)?2:1;
-       }
-       for(let i=0;i<D[u];i++)for(let j=0;j<D[v];){
-         const c=M[i*D[v]+j];if(!c){j++;continue}
-         let w=1;while(j+w<D[v]&&M[i*D[v]+j+w]===c)w++;
-         let h=1;grow:while(i+h<D[u]){for(let m=0;m<w;m++)if(M[(i+h)*D[v]+j+m]!==c)break grow;h++}
-         for(let r=0;r<h;r++)for(let m=0;m<w;m++)M[(i+r)*D[v]+j+m]=0;
-         const pl=k+(sg>0?1:0);
-         const cor=(uu,vv)=>{const p=[0,0,0];p[a]=pl;p[u]=uu;p[v]=vv;return T(ox+p[0]*cs,p[1]*ch,oz+p[2]*cs)};
-         const cc=[0,0,0];cc[a]=pl-sg*.5;cc[u]=i+h/2;cc[v]=j+w/2;
-         poly([cor(i,j),cor(i+h,j),cor(i+h,j+w),cor(i,j+w)],T(ox+cc[0]*cs,cc[1]*ch,oz+cc[2]*cs),{k:c===1?(a===1?'gtop':'glassc'):'recess'});
-         j+=w;
-       }
-     }
-   }
-   [[0,0],[5,0],[5,5],[0,5]].forEach(([x,z])=>{
-     const wx=ox+(x?NX:0)*cs,wz=oz+(z?NZ:0)*cs;let s=-1;
-     for(let y=0;y<=NY;y++){const on=y<NY&&at(x,y,z);if(on&&s<0)s=y;if(!on&&s>=0){line([wx,s*ch,wz],[wx,y*ch,wz],.75,1);s=-1}}
-   });
-   P.forEach(([x,z])=>{if(!at(x,NY-1,z))return;
-     const x0=ox+x*cs,z0=oz+z*cs,y=NY*ch;
-     if(z===0)line([x0,y,z0],[x0+cs,y,z0],.7,1);if(z===5)line([x0,y,z0+cs],[x0+cs,y,z0+cs],.7,1);
-     if(x===0)line([x0,y,z0],[x0,y,z0+cs],.7,1);if(x===5)line([x0+cs,y,z0],[x0+cs,y,z0+cs],.7,1)});
-   box(0,0,.9,.9,6.0,6.18,{k:'glass'});
-   box(0,0,.94,.94,6.18,6.22,{k:'band'});
-   box(0,0,.5,.5,6.22,6.28,{k:'solid'});
-   beacon(0,6.34,0);
-   label(0,6.4,0,'MahaNakhon','มหานคร');}
+/* ---------- ICONSIAM: terraced mall + sail roof, Magnolias (317 m) + Mandarin Oriental (270 m) ---------- */
+{const g=grp(-4.7,-3.2,1,0,.6);
+ [[1.1,0,.3],[.85,.3,.55],[.6,.55,.8],[.35,.8,1.0]].forEach(([fx,a,b])=>{
+   const w=fx+1;mesh(ext(roundS(w,4.4,.12),a,b,(fx-1)/2,0),MAT.glass,g);
+   polyline([[fx,b,-2.15],[fx,b,2.15]],MAT.edgeGold,g)});
+ const N=30,M=10,xE=.32,xB=-.95;
+ const surf=(s,v)=>{const he=1.05+1.25*Math.pow(s,2.4);const lift=s>.82?Math.pow((s-.82)/.18,2)*.5*Math.pow(1-v,1.5):0;
+   return[xE+(xB-xE)*v,he+.3*Math.sin(Math.PI*Math.min(1,v*1.12))*(1-.25*s)+.12*v+lift,-2.0+3.9*s+lift*.55]};
+ const pos=[],idx=[];for(let i=0;i<=N;i++)for(let j=0;j<=M;j++)pos.push(...surf(i/N,j/M));
+ for(let i=0;i<N;i++)for(let j=0;j<M;j++){const a=i*(M+1)+j,b=a+M+1;idx.push(a,b,a+1,a+1,b,b+1)}
+ const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));sg.setIndex(idx);sg.computeVertexNormals();
+ g.add(new THREE.Mesh(sg,MAT.glassHi));
+ const eave=[],ridge=[];for(let i=0;i<=N;i++){eave.push(surf(i/N,0));ridge.push(surf(i/N,1))}
+ polyline(eave,MAT.edgeGold,g);polyline(ridge,MAT.edge,g);
+ for(let i=0;i<=N;i+=3){const r=[];for(let j=0;j<=M;j++)r.push(surf(i/N,j/M));polyline(r,MAT.edgeSoft,g)}
+ const wall=(v)=>{const p=[],ix=[];for(let i=0;i<=N;i++){const t=surf(i/N,v);p.push(t[0],1,t[2],...t);if(i<N){const a=i*2;ix.push(a,a+2,a+1,a+1,a+2,a+3)}}
+   const w=new THREE.BufferGeometry();w.setAttribute('position',new THREE.Float32BufferAttribute(p,3));w.setIndex(ix);w.computeVertexNormals();g.add(new THREE.Mesh(w,MAT.glass))};
+ wall(0);wall(1);
+ {const s=1,p=[[ (xE+xB)/2,1,surf(1,.5)[2]]];for(let j=0;j<=M;j++)p.push(surf(s,j/M));
+  const t=[];for(let j=1;j<=M;j++)t.push(...p[0],...p[j],...p[j+1]||p[j]);
+  const ag=new THREE.BufferGeometry();ag.setAttribute('position',new THREE.Float32BufferAttribute(t,3));ag.computeVertexNormals();g.add(new THREE.Mesh(ag,MAT.glass));
+  const apex=surf(1,.45);lines([[[xE,1,apex[2]],apex],[[xB,1,apex[2]],apex]],MAT.edgeGold,g)}
+ frustum(.95,.8,0,5.7,1,MAT.glass,g,{x:-1.95,z:-.7});
+ frustum(.95,.8,5.7,6.34,.55,MAT.glassHi,g,{x:-1.95,z:-.7,sx:-.12});
+ beacon(-2.02,6.4,-.7,g);
+ frustum(.85,.72,0,5.15,1,MAT.glass,g,{x:-1.95,z:1.25});
+ frustum(.85,.72,5.15,5.42,.7,MAT.glassHi,g,{x:-1.95,z:1.25});
+ label(g,-.6,6.65,-.3,'ICONSIAM','ไอคอนสยาม');}
 
-  /* ---------- Baiyoke Tower II (304 m roof) — stepped shaft, dark glass spine, rotating Thai-flag LED ring ---------- */
-  {grp(3.4,5.6);
-   prism(0,0,NOTCH(1.75,1.4,.16),0,.55);
-   prism(0,0,NOTCH(1.5,1.22,.15),.55,1.25);
-   prism(0,0,NOTCH(1.18,1.02,.13),1.25,2.45);
-   prism(0,0,NOTCH(1.0,.92,.12),2.45,4.35);
-   prism(0,0,NOTCH(.9,.84,.11),4.35,5.6);
-   box(0,0,.2,.95,2.6,5.6,{k:'dark'});
-   box(0,0,.94,.16,3.4,5.6,{k:'dark'});
-   [-1,1].forEach(s=>{cyl(0,s*.47,.13,4,2.42,2.72,.05,{k:'glow'});cyl(0,s*.44,.13,4,5.25,5.5,.05,{k:'glow'})});
-   box(0,0,.84,.8,5.6,5.68,{k:'band'});
-   cyl(0,0,.4,24,5.68,5.85,1,{k:'glass'});
-   cyl(0,0,.425,40,5.85,6.03,1,{k:'flag',top:false});
-   cyl(0,0,.41,24,6.03,6.08,1,{k:'band'});
-   for(let i=0;i<5;i++){const a=i/5*Math.PI/2,b=(i+1)/5*Math.PI/2,r0=.4*Math.cos(a),r1=Math.max(.02,.4*Math.cos(b));
-     cyl(0,0,r0,24,6.08+.24*Math.sin(a),6.08+.24*Math.sin(b),r1/r0,{k:'solid',top:i===4})}
-   cyl(0,0,.035,6,6.3,6.62,.4,{k:'solid'});
-   [6.42,6.52].forEach(y=>box(0,0,.16,.025,y,y+.02,{k:'band'}));
-   beacon(0,6.66,0);
-   label(0,6.75,0,'Baiyoke Tower II','ใบหยก 2');}
+/* ---------- Wat Arun (~80 m) ---------- */
+{const g=grp(-2.9,2.2,.5,0,.75);
+ [[1.8,0,.2],[1.4,.2,.4],[1.05,.4,.6]].forEach(([s,a,b])=>box(s,b-a,s,0,a,0,MAT.stone,g,MAT.edgeSoft));
+ [[0,-1],[1,0],[0,1],[-1,0]].forEach(([dx,dz])=>{
+   const stairs=new THREE.BoxGeometry(.16,.02,.55);const m=new THREE.Mesh(stairs,MAT.stone);
+   m.position.set(dx*.72,.3,dz*.72);m.rotation.y=dx?Math.PI/2:0;m.rotation.x=dz?dz*.83:0;m.rotation.z=dx?-dx*.83:0;g.add(m);
+   const mx=dx*.55+dz*.32,mz=dz*.55+dx*.32;box(.14,.18,.14,mx,.6,mz,MAT.stone,g,null);
+   const r=new THREE.Mesh(new THREE.ConeGeometry(.12,.22,4),MAT.goldFlat);r.rotation.y=Math.PI/4;r.position.set(mx,.89,mz);g.add(r)});
+ const prang=(r,y0,y1,n=16)=>{const pts=[[r*1.15,y0],[r*1.1,y0+.04]];const T=14;
+   for(let i=0;i<=T;i++){const t=i/T,rr=r*(Math.sin(Math.PI*(.5+t*.47))*(1-t*.5)+.08*(1-t))*(i%2?1:1.06);pts.push([rr,y0+.04+(y1-y0-.04)*t])}
+   pts.push([0,y1]);return pts};
+ lathe(prang(.4,.6,2.75),16,MAT.stoneFlat,g);
+ cyl(.045,.03,2.75,2.95,8,MAT.gold,g);cyl(.02,.003,2.95,3.3,8,MAT.gold,g);
+ [[-.68,-.68],[.68,-.68],[.68,.68],[-.68,.68]].forEach(([x,z])=>{lathe(prang(.17,.2,1.35,12),12,MAT.stoneFlat,g,{x,z});cyl(.012,.002,1.35,1.6,6,MAT.gold,g,{x,z})});
+ label(g,0,3.5,0,'Wat Arun','วัดอรุณ');}
 
-  /* ---------- State Tower / lebua (247 m) ---------- */
-  {grp(2.4,-1.4,.906);
-   box(0,0,1.65,1.3,0,.85);
-   box(0,0,1.45,1.15,.85,1.2);
-   box(0,0,.95,.95,1.2,4.0);
-   for(let y=1.6;y<4;y+=.8) prism(0,0,OCT(1.04,.16),y,y+.04,1,{k:'band'});
-   box(0,0,1.06,1.06,4.0,4.1,{k:'band'});
-   cyl(0,0,.47,20,4.1,4.18,1,{k:'band'});
-   cyl(0,0,.33,20,4.18,4.5,1,{k:'glass',top:false});
-   for(let i=0;i<16;i++){const a=i/16*Math.PI*2;box(Math.cos(a)*.41,Math.sin(a)*.41,.035,.035,4.18,4.5,{k:'solid'})}
-   cyl(0,0,.47,20,4.5,4.56,1,{k:'band'});
-   const Rd=.42,K=7;
-   for(let i=0;i<K;i++){const a=i/K*Math.PI/2,b=(i+1)/K*Math.PI/2,r0=Rd*Math.cos(a),r1=Math.max(.03,Rd*Math.cos(b));
-     cyl(0,0,r0,20,4.56+Rd*Math.sin(a),4.56+Rd*Math.sin(b),r1/r0,{k:'glow',top:i===K-1})}
-   for(let m=0;m<10;m++){const t=m/10*Math.PI*2;let pv=null;for(let i=0;i<=6;i++){const a=i/6*Math.PI/2;const p=[Math.cos(t)*Rd*Math.cos(a)*1.01,4.56+Rd*Math.sin(a),Math.sin(t)*Rd*Math.cos(a)*1.01];if(pv)line(pv,p,.35,.8);pv=p}}
-   cyl(0,0,.07,10,4.98,5.08,1,{k:'solid'});
-   cyl(0,0,.025,6,5.08,5.45,.3,{k:'glow'});
-   label(0,5.55,0,'State Tower','สเตท ทาวเวอร์');}
+/* ---------- Grand Palace: Chakri Maha Prasat ---------- */
+{const g=grp(1.8,3.6,.48,0,.9);
+ const roof=(len,wid,y0,h,ax,x=0,z=0)=>{const L=len/2,W=wid/2;
+   const P=(a,b,y)=>ax==='x'?[x+a,y,z+b]:[x+b,y,z+a];
+   const v=[P(-L,-W,y0),P(L,-W,y0),P(L,0,y0+h),P(-L,-W,y0),P(L,0,y0+h),P(-L,0,y0+h),P(L,W,y0),P(-L,W,y0),P(-L,0,y0+h),P(L,W,y0),P(-L,0,y0+h),P(L,0,y0+h),P(-L,-W,y0),P(-L,0,y0+h),P(-L,W,y0),P(L,-W,y0),P(L,W,y0),P(L,0,y0+h)];
+   const rg=new THREE.BufferGeometry();rg.setAttribute('position',new THREE.Float32BufferAttribute(v.flat(),3));rg.computeVertexNormals();g.add(new THREE.Mesh(rg,MAT.dark));
+   lines([[P(-L,-W,y0),P(L,-W,y0)],[P(-L,W,y0),P(L,W,y0)],[P(-L,0,y0+h),P(L,0,y0+h)],[P(-L,-W,y0),P(-L,0,y0+h)],[P(-L,W,y0),P(-L,0,y0+h)],[P(L,-W,y0),P(L,0,y0+h)],[P(L,W,y0),P(L,0,y0+h)],
+     [P(-L,0,y0+h),P(-L-.07,0,y0+h+.13)],[P(L,0,y0+h),P(L+.07,0,y0+h+.13)]],MAT.edgeGold,g)};
+ const spire=(y0,y1,r,x=0,z=0)=>{const pts=[];const T=10;for(let i=0;i<=T;i++){const t=i/T;pts.push([r*(1-t*.93)*(i%2?1:1.12),y0+(y1-y0)*t])}pts.push([0,y1]);lathe(pts,8,MAT.goldFlat,g,{x,z});cyl(.012,.002,y1,y1+.3,6,MAT.gold,g,{x,z})};
+ box(2.3,.5,.6,0,0,0,MAT.stone,g);box(2.2,.3,.56,0,.5,0,MAT.stone,g);
+ for(let i=0;i<=12;i++)cyl(.025,.025,0,.5,8,MAT.stone,g,{x:-1.1+i*2.2/12,z:-.33});
+ box(.7,.95,.8,0,0,-.05,MAT.stone,g);
+ roof(.9,.7,1.0,.32,'z',0,-.05);roof(.8,.6,1.0,.3,'x',0,-.05);roof(.6,.5,1.14,.3,'z',0,-.05);roof(.55,.42,1.14,.28,'x',0,-.05);
+ spire(1.38,2.45,.15,0,-.05);
+ [-1,1].forEach(s=>{roof(.75,.62,.8,.26,'x',s*.68,0);const px=s*.95;box(.36,.18,.42,px,.8,0,MAT.stone,g,null);roof(.48,.42,.98,.24,'z',px,0);roof(.44,.38,.98,.22,'x',px,0);spire(1.16,1.85,.1,px,0)});
+ label(g,0,3.0,-.05,'Grand Palace','พระบรมมหาราชวัง');}
 
-  /* ---------- ICONSIAM — terraced riverfront mall, sail roof, Magnolias (317 m) + Mandarin Oriental (270 m) ---------- */
-  {grp(-4.3,-3.6);
-   [[1.1,0,.3],[.85,.3,.55],[.6,.55,.8],[.35,.8,1.0]].forEach(([fx,y0,y1])=>{
-     const w=fx+1,cx=(fx-1)/2;
-     box(cx,0,w,4.4,y0,y1,{k:'glass'});
-     box(cx+.02,0,w+.04,4.46,y1-.02,y1+.01,{k:'band',top:false});});
-   box(1.3,0,.35,3.2,0,.05,{k:'solid'});
-   const N=16,xE=.3,xM=-.32,xB=-.95,Zs=[],E=[],M=[],B=[];
-   for(let i=0;i<=N;i++){const s=i/N,z=-2.0+3.9*s,he=1.05+1.2*Math.pow(s,2.4);
-     Zs.push(z);E.push([xE,he,z]);M.push([xM,he+.24-.06*s,z]);B.push([xB,he+.14,z]);}
-   const C=T(-.3,.95,0);
-   for(let i=0;i<N;i++){
-     poly([T(...E[i]),T(...E[i+1]),T(...M[i+1]),T(...M[i])],T(-.3,.95,Zs[i]),{k:'sail'});
-     poly([T(...M[i]),T(...M[i+1]),T(...B[i+1]),T(...B[i])],T(-.3,.95,Zs[i]),{k:'sail'});
-     poly([T(xE,1,Zs[i]),T(xE,1,Zs[i+1]),T(...E[i+1]),T(...E[i])],T(-.3,1,Zs[i]),{k:'glassc'});
-     poly([T(xB,1,Zs[i]),T(xB,1,Zs[i+1]),T(...B[i+1]),T(...B[i])],T(-.3,1,Zs[i]),{k:'glassc'});
-     line(E[i],M[i],.3,.7);line(M[i],B[i],.3,.7);
-     line(E[i],E[i+1],.95,1.6);line(B[i],B[i+1],.5,1);
-   }
-   const zN=Zs[N],tip=[xE+.12,E[N][1]+.38,zN+.28];
-   poly([T(xE,1,zN),T(...E[N]),T(...M[N]),T(...B[N]),T(xB,1,zN)],T(-.3,1.2,zN-.5),{k:'glassc'});
-   poly([T(xE,1,Zs[0]),T(...E[0]),T(...M[0]),T(...B[0]),T(xB,1,Zs[0])],T(-.3,1.1,Zs[0]+.5),{k:'glassc'});
-   poly([T(...E[N]),T(...tip),T(...M[N])],C,{k:'sail'});
-   line(E[N],tip,.95,1.6);line(tip,M[N],.6,1);
-   line([xE-.05,1,zN+.01],[xM,M[N][1]-.05,zN+.01],.85,1.2);line([xB+.05,1,zN+.01],[xM,M[N][1]-.05,zN+.01],.85,1.2);
-   // Magnolias Waterfront Residences
-   box(-1.95,-.7,.95,.8,0,5.7);
-   box(-2.0,-.7,.8,.74,5.7,6.0);
-   box(-2.03,-.7,.64,.64,6.0,6.2);
-   box(-2.05,-.7,.46,.52,6.2,6.34,{k:'glow'});
-   beacon(-2.05,6.4,-.7);
-   // Mandarin Oriental Residences
-   box(-1.95,1.2,.85,.72,0,5.15);
-   box(-1.98,1.2,.66,.6,5.15,5.4,{k:'glow'});
-   label(-.3,6.55,-.2,'ICONSIAM','ไอคอนสยาม');}
+/* ---------- Bhumibol Bridge ---------- */
+{const g=grp(xr(-7.6),-7.6,1,0,1.0);
+ box(9.4,.12,.6,0,.84,0,MAT.stone,g);
+ for(let x=-4.4;x<=4.4;x+=.7){if(Math.abs(x)<1.3)continue;box(.12,.84,.16,x,0,0,MAT.stone,g,null)}
+ const C=[];
+ [-2.2,2.2].forEach(px=>{
+   [-1,1].forEach(s=>{beam([px,0,s*.12],[px,.96,s*.45],.06,MAT.stone,g);beam([px,.96,s*.45],[px,2.3,0],.065,MAT.stone,g,.055)});
+   box(.14,.08,.9,px,.78,0,MAT.stone,g,null);
+   cyl(.085,.07,2.25,3.05,12,MAT.stone,g);
+   cyl(.12,.12,3.05,3.12,8,MAT.gold,g);
+   const pts=[];for(let i=0;i<=8;i++){const t=i/8;pts.push([.1*(1-t*.9)*(i%2?1:1.15),3.12+.22*t])}lathe(pts,8,MAT.goldFlat,g,{x:px});
+   cyl(.012,.002,3.34,3.46,6,MAT.gold,g,{x:px});beacon(px,3.47,0,g,true);
+   for(let k=0;k<10;k++){const y=2.35+k*.075;[-1,1].forEach(dir=>[-1,1].forEach(sd=>C.push([[px,y,0],[px+dir*(.35+k*.2),.97,sd*.28]])))}
+ });
+ lines(C,MAT.cable,g);
+ label(g,0,3.75,0,'Bhumibol Bridge','สะพานภูมิพล');}
 
-  /* ---------- Bhumibol Bridge — diamond pylons with gold spires, cable fans ---------- */
-  {const xr=z=>-1.4+.12*z+.7*Math.sin(z*.45);
-   grp(xr(-7.2),-7.2);
-   box(0,0,9.2,.56,.84,.95,{k:'solid'});
-   [-1,1].forEach(s=>line([-4.6,1.0,s*.28],[4.6,1.0,s*.28],.4,.8));
-   for(let x=-4.2;x<=4.2;x+=.7){if(Math.abs(x)<1.2)continue;box(x,0,.1,.14,0,.84,{k:'solid'})}
-   [-2.2,2.2].forEach(px=>{
-     [-1,1].forEach(s=>{
-       prism(px,s*.14,R(.12,.12),0,.95,1,{k:'solid',sz:s*.3});
-       prism(px,s*.44,R(.12,.12),.95,2.25,1,{k:'solid',sz:-s*.44});});
-     box(px,0,.14,.95,.78,.86,{k:'solid'});
-     box(px,0,.16,.16,2.25,3.05,{k:'solid'});
-     cyl(px,0,.12,8,3.05,3.12,1,{k:'band'});
-     prang(px,0,3.12,3.32,.09,4,8,0,{k:'glow',nob:1});
-     cyl(px,0,.012,6,3.32,3.46,.3,{k:'glow'});
-     beacon(px,3.48,0);
-     for(let k=0;k<9;k++){const y=2.35+k*.08;[-1,1].forEach(dir=>[-1,1].forEach(sd=>{
-       line([px,y,0],[px+dir*(.35+k*.2),.96,sd*.27],.32,.6)}))}
-   });
-   label(0,3.75,0,'Bhumibol Bridge','สะพานภูมิพล');}
+/* ---------- Wat Paknam Big Buddha (enlarged on purpose: the largest figure in the scene) ---------- */
+{const g=grp(-3.4,11.5,6.4,0,1.15);const G=MAT.gold;
+ /* lotus throne */
+ cyl(.66,.62,0,.06,64,MAT.stone,g);
+ const base=new THREE.Mesh(new THREE.CylinderGeometry(.6,.64,.06,64),G);base.scale.z=.78;base.position.y=.09;g.add(base);
+ for(let i=0;i<26;i++){const a=i/26*Math.PI*2;const p=ellip(.06,.075,.025,Math.cos(a)*.6,.16,Math.sin(a)*.6*.78,G,g,{ws:12,hs:8});p.rotation.y=-a+Math.PI/2;p.rotation.x=-.35}
+ for(let i=0;i<22;i++){const a=(i+.5)/22*Math.PI*2;const p=ellip(.055,.06,.022,Math.cos(a)*.54,.2,Math.sin(a)*.54*.78,G,g,{ws:12,hs:8});p.rotation.y=-a+Math.PI/2;p.rotation.x=-.25}
+ /* crossed legs, knees, soles, hands in meditation */
+ ellip(.56,.15,.34,0,.3,-.05,G,g);
+ ellip(.15,.12,.17,-.42,.29,-.12,G,g);ellip(.15,.12,.17,.42,.29,-.12,G,g);
+ ellip(.13,.035,.055,-.15,.4,-.17,G,g,{rot:[0,.5,.15]});ellip(.13,.035,.055,.17,.39,-.2,G,g,{rot:[0,-.4,-.1]});
+ ellip(.15,.045,.085,0,.43,-.2,G,g);ellip(.13,.04,.075,0,.47,-.21,G,g);
+ /* torso + robe */
+ const torso=lathe([[0,.32],[.25,.33],[.26,.42],[.27,.55],[.295,.68],[.31,.75],[.29,.8],[.22,.85],[.1,.875],[0,.88]],48,G,g);torso.scale.z=.64;torso.position.z=.02;
+ const robe=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[-.3,.8,.02],[-.18,.76,-.17],[0,.62,-.2],[.17,.48,-.19],[.26,.4,-.12]].map(p=>new THREE.Vector3(...p))),40,.028,10),G);g.add(robe);
+ ellip(.12,.08,.16,-.27,.77,.02,G,g);
+ const fold=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([[-.25,.72,-.12],[-.28,.55,-.14],[-.3,.42,-.15]].map(p=>new THREE.Vector3(...p))),20,.018,8),G);g.add(fold);
+ /* arms */
+ [-1,1].forEach(s=>{capsule([s*.3,.76,.02],[s*.37,.5,-.05],.065,G,g);capsule([s*.37,.5,-.05],[s*.13,.42,-.19],.055,G,g)});
+ /* neck + head */
+ cyl(.08,.075,.86,.94,32,G,g);
+ [.885,.91].forEach(y=>{const t=new THREE.Mesh(new THREE.TorusGeometry(.078,.006,8,32),G);t.rotation.x=Math.PI/2;t.position.y=y;g.add(t)});
+ const HC=[0,1.05,0],HR=[.128,.152,.135];
+ ellip(...HR,...HC,G,g,{ws:48,hs:32});
+ ellip(.03,.022,.025,0,1.03,-.133,G,g);
+ ellip(.05,.012,.02,0,.975,-.128,G,g);
+ [-1,1].forEach(s=>{ellip(.022,.012,.012,s*.045,1.07,-.125,G,g);ellip(.02,.095,.04,s*.128,1.0,.005,G,g)});
+ ellip(.11,.015,.08,0,1.115,-.07,G,g);
+ /* snail-shell curls */
+ const curl=new THREE.SphereGeometry(.017,10,8),pts=[];
+ const fib=(n,keep,cx,cy,cz,rx,ry,rz)=>{for(let i=0;i<n;i++){const y=1-2*(i+.5)/n,r=Math.sqrt(1-y*y),th=i*2.39996,x=Math.cos(th)*r,z=Math.sin(th)*r;if(keep(x,y,z))pts.push([cx+x*rx*1.04,cy+y*ry*1.04,cz+z*rz*1.04])}};
+ fib(420,(x,y,z)=>y>(z<-.2?.48:.18),...HC,...HR);
+ fib(90,(x,y,z)=>y>-.2,0,1.2,0,.085,.075,.085);
+ const inst=new THREE.InstancedMesh(curl,G,pts.length);const m4=new THREE.Matrix4();pts.forEach((p,i)=>{m4.makeTranslation(...p);inst.setMatrixAt(i,m4)});g.add(inst);
+ ellip(.085,.075,.085,0,1.2,0,G,g);
+ lathe([[.045,1.26],[.05,1.29],[.04,1.33],[.025,1.37],[.01,1.41],[0,1.44]],24,MAT.glowGold,g);
+ beacon(0,1.45,0,g,true);
+ label(g,0,1.52,0,'Big Buddha · Wat Paknam','พระใหญ่วัดปากน้ำ');}
 
-  /* ---------- Wat Arun (≈80 m) ---------- */
-  {grp(-2.5,1.8,.49);
-   [[1.8,0,.2],[1.4,.2,.4],[1.05,.4,.6]].forEach(([s,a,b])=>box(0,0,s,s,a,b,{k:'solid'}));
-   [[0,-1],[1,0],[0,1],[-1,0]].forEach(([dx,dz])=>{
-     const o=.08,a=[dx*.9+(dz?o:0),0,dz*.9+(dx?o:0)],b=[dx*.52+(dz?o:0),.6,dz*.52+(dx?o:0)],a2=[dx*.9-(dz?o:0),0,dz*.9-(dx?o:0)],b2=[dx*.52-(dz?o:0),.6,dz*.52-(dx?o:0)];
-     line(a,b,.55,1);line(a2,b2,.55,1);
-     const mx=dx*.55+dz*.3,mz=dz*.55+dx*.3;
-     box(mx,mz,.14,.14,.6,.78,{k:'solid'});cyl(mx,mz,.11,4,.78,.98,.08,{k:'roof'});});
-   prang(0,0,.6,2.75,.4,10,12,1);
-   cyl(0,0,.045,8,2.75,2.95,.6,{k:'glow'});
-   cyl(0,0,.02,6,2.95,3.3,.3,{k:'glow'});
-   [[-.68,-.68],[.68,-.68],[.68,.68],[-.68,.68]].forEach(([dx,dz])=>{prang(dx,dz,.2,1.35,.17,6,8,1,{nob:1});cyl(dx,dz,.012,6,1.35,1.6,.3,{k:'glow'})});
-   label(0,3.45,0,'Wat Arun','วัดอรุณ');}
+/* ---------- camera & controls ---------- */
+const target=new THREE.Vector3(-.4,3.0,1.8);
+const controls=new OrbitControls(camera,canvas);
+controls.target.copy(target);controls.enableDamping=true;controls.dampingFactor=.075;controls.rotateSpeed=.6;controls.zoomSpeed=.9;
+controls.enablePan=false;controls.minDistance=6;controls.maxDistance=60;controls.minPolarAngle=.2;controls.maxPolarAngle=1.48;
+controls.autoRotate=!reduce;controls.autoRotateSpeed=.35;
+let resumeT=null;
+const hint=document.getElementById('hint');
+controls.addEventListener('start',()=>{controls.autoRotate=false;if(hint)hint.style.opacity=0;clearTimeout(resumeT)});
+controls.addEventListener('end',()=>{if(!reduce)resumeT=setTimeout(()=>controls.autoRotate=true,3500)});
+function home(){const a=camera.aspect,dist=44/Math.min(1,a*1.3);camera.position.copy(target).add(new THREE.Vector3().setFromSphericalCoords(dist,1.12,Math.PI-.38));controls.target.copy(target);controls.update()}
 
-  /* ---------- Grand Palace — Chakri Maha Prasat ---------- */
-  {grp(2.0,3.4,.45);
-   box(0,0,2.3,.6,0,.5);box(0,0,2.2,.56,.5,.8);
-   for(let i=0;i<=12;i++){const x=-1.15+i*2.3/12;line([x,0,-.31],[x,.5,-.31],.35,.8)}
-   box(0,-.05,.7,.8,0,.95);box(0,-.05,.78,.88,.95,1.0,{k:'band'});
-   gable(0,-.05,.9,.7,1.0,.32,'z',{chofa:1});gable(0,-.05,.8,.6,1.0,.3,'x',{chofa:1});
-   gable(0,-.05,.6,.5,1.14,.3,'z',{chofa:1});gable(0,-.05,.55,.42,1.14,.28,'x',{chofa:1});
-   prang(0,-.05,1.38,2.45,.15,8,8,0,{k:'roof'});cyl(0,-.05,.012,6,2.45,2.75,.3,{k:'glow'});
-   [-1,1].forEach(s=>{gable(s*.68,0,.75,.62,.8,.26,'x',{chofa:1});const px=s*.95;
-     box(px,0,.36,.42,.8,.98,{k:'solid'});gable(px,0,.48,.42,.98,.24,'z',{chofa:1});gable(px,0,.44,.38,.98,.22,'x',{chofa:1});
-     prang(px,0,1.16,1.85,.1,6,8,0,{k:'roof',nob:1});cyl(px,0,.01,6,1.85,2.05,.3,{k:'glow'})});
-   label(0,2.9,-.05,'Grand Palace','พระบรมมหาราชวัง');}
+const composer=new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene,camera));
+const bloom=new UnrealBloomPass(new THREE.Vector2(256,256),.38,.4,.9);composer.addPass(bloom);
+composer.addPass(new OutputPass());
 
-  /* ---------- Wat Paknam — Big Buddha (69 m) + white Maha Chedi (80 m) ---------- */
-  {grp(-5.9,.7);
-   prism(0,0,EL(.55,.42,20),0,.1,1,{k:'band'});
-   prism(0,0,EL(.5,.38,20),.1,.18,1.06,{k:'solid'});
-   prism(0,-.06,EL(.46,.28,18),.18,.36,.88,{k:'solid'});
-   prism(0,.03,EL(.25,.17,16),.34,.78,1.2,{k:'solid'});
-   prism(0,.03,EL(.3,.2,16),.78,.86,.55,{k:'solid'});
-   cyl(0,.03,.075,10,.86,.91,1,{k:'solid'});
-   const hc=1.04,hr=.15;
-   for(let i=0;i<6;i++){const a=-Math.PI/2+i/6*Math.PI,b=-Math.PI/2+(i+1)/6*Math.PI,r0=Math.max(.04,hr*Math.cos(a)),r1=Math.max(.04,hr*Math.cos(b));
-     prism(0,.02,EL(r0,r0*1.05,14),hc+hr*Math.sin(a),hc+hr*Math.sin(b),r1/r0,{k:'glow',top:i===5})}
-   cyl(0,.03,.08,10,1.17,1.25,.6,{k:'glow'});
-   cyl(0,.03,.04,8,1.25,1.38,.05,{k:'glow'});
-   [-1,1].forEach(s=>{prism(s*.3,.04,EL(.06,.07,8),.42,.8,1,{k:'solid',sx:-s*.03});
-     box(s*.1,-.17,.18,.08,.36,.42,{k:'solid'});});
-   line([-.27,.8,-.14],[.2,.38,-.18],.6,1);
-   prism(-.7,1.9,OCT(1.0,.2),0,.25,1,{k:'solid'});
-   prism(-.7,1.9,OCT(.78,.16),.25,.45,1,{k:'solid'});
-   prism(-.7,1.9,OCT(.6,.12),.45,.6,1,{k:'solid'});
-   cyl(-.7,1.9,.27,16,.6,.95,.6,{k:'solid'});
-   prang(-.7,1.9,.95,1.45,.16,7,12,0,{k:'solid',nob:1});
-   cyl(-.7,1.9,.015,6,1.45,1.6,.3,{k:'glow'});
-   label(0,1.5,0,'Big Buddha · Wat Paknam','พระใหญ่วัดปากน้ำ');}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);composer.setSize(w,h);bloom.setSize(w/2,h/2);camera.aspect=w/h;camera.updateProjectionMatrix()}
+resize();home();
+new ResizeObserver(()=>{resize()}).observe(stage);
+document.getElementById('reset').addEventListener('click',()=>{controls.autoRotate=!reduce;home()});
 
-  /* ---------- Robot Building (83 m) ---------- */
-  {grp(6.9,-2.8,.55);const F=-.43;
-   box(0,0,1.35,1.0,0,.22,{k:'dark'});
-   for(let i=0;i<7;i++){const x=-.6+i*.2;box(x,-.51,.12,.04,.04,.18,{k:'band'});box(x,.51,.12,.04,.04,.18,{k:'band'})}
-   box(0,0,1.2,.88,.22,1.15);box(0,.03,1.08,.86,1.15,1.75);box(0,.05,.96,.82,1.75,2.4);
-   [-.22,.22].forEach(dx=>{box(dx,F-.01,.28,.05,2.02,2.28,{k:'dark'});box(dx,F-.04,.09,.03,2.1,2.19,{k:'glow'});box(dx,F-.03,.3,.06,2.29,2.32,{k:'glow'})});
-   box(0,F-.01,.46,.05,1.86,1.92,{k:'dark'});
-   [-1,1].forEach(s=>[2.15,1.45,.7].forEach((y,i)=>cyl(s*(i===0?.53:i===1?.59:.65),0,.06,8,y,y+.1,1,{k:'solid'})));
-   [-.3,.3].forEach(dx=>{cyl(dx,.05,.03,6,2.4,2.95,1,{k:'solid'});cyl(dx,.05,.05,8,2.95,3.03,1,{k:'glow'})});
-   label(0,3.2,0,'Robot Building','ตึกหุ่นยนต์');}
-
-  /* ---------- Elephant Building (102 m) ---------- */
-  {grp(7.3,3.4,.58);const F=-.55;
-   [[-.45,0],[.45,0],[0,.6]].forEach(([dx,dz])=>{box(dx,dz,.46,.46,0,2.6);box(dx,dz,.52,.52,0,.12,{k:'band'})});
-   box(0,.25,1.5,1.25,2.6,3.25);box(0,.25,1.56,1.31,3.25,3.3,{k:'band'});box(0,.4,.5,.4,3.3,3.5,{k:'solid'});
-   box(0,F+.15,.78,.5,2.4,3.5);
-   [-1,1].forEach(s=>{box(s*.45,F+.22,.06,.5,2.55,3.35,{k:'glass'});box(s*.18,F-.11,.13,.04,3.12,3.24,{k:'dark'});cyl(s*.2,F-.08,.025,6,2.0,2.4,.6,{k:'glow',sz:-.12})});
-   box(0,F-.07,.15,.12,1.55,2.4,{k:'solid'});box(0,F-.12,.22,.18,1.55,1.66,{k:'solid'});
-   label(0,3.7,0,'Elephant Building','ตึกช้าง');}
-
-  const MAXH=6.7;
-  const xr=z=>-1.4+.12*z+.7*Math.sin(z*.45);
-
-  /* ---------- camera ---------- */
-  const home={yaw:-.28,pitch:.4,zoom:1};
-  let yaw=home.yaw,pitch=home.pitch,zoom=home.zoom,vYaw=0,vPitch=0,last=-1e9;
-  let cs,ss,cp,sp,K;
-  const TX=.4,TY=2.0,TZ=-.6,FOC=60;
-  function V(x,y,z){x-=TX;y-=TY;z-=TZ;const X=x*cs-z*ss;let Z=x*ss+z*cs;const Y=y*cp+Z*sp;Z=-y*sp+Z*cp;return[X,Y,Z]}
-  function Vn(n){const X=n[0]*cs-n[2]*ss;let Z=n[0]*ss+n[2]*cs;const Y=n[1]*cp+Z*sp;Z=-n[1]*sp+Z*cp;return[X,Y,Z]}
-  function S(v){const s=FOC/(FOC+v[2]);return[W/2+v[0]*s*K,H*.64-v[1]*s*K,v[2]]}
-  const P=(x,y,z)=>S(V(x,y,z));
-  const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
-  function path(pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath()}
-  const LD=(()=>{const l=[-.5,.62,-.6],m=Math.hypot(...l);return l.map(v=>v/m)})();
-
-  /* ---------- input ---------- */
-  const ptr=new Map();let pinch=0;
-  const hint=document.getElementById('hint');
-  const touched=()=>{last=performance.now();hint.style.opacity=0};
-  const clampZ=z=>Math.max(.6,Math.min(6,z));
-  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});touched();vYaw=vPitch=0;
-    if(ptr.size===2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y)}});
-  cv.addEventListener('pointermove',e=>{
-    if(!ptr.has(e.pointerId))return;
-    const p=ptr.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;touched();
-    if(ptr.size===1){vYaw=dx*.008;vPitch=dy*.006;yaw+=vYaw;pitch=Math.max(-.05,Math.min(1.4,pitch+vPitch))}
-    else if(ptr.size===2){const [a,b]=[...ptr.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch)zoom=clampZ(zoom*d/pinch);pinch=d}
-  });
-  const up=e=>{ptr.delete(e.pointerId);pinch=0};
-  cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
-  cv.addEventListener('wheel',e=>{e.preventDefault();touched();zoom=clampZ(zoom*Math.exp(-e.deltaY*.0015))},{passive:false});
-  cv.addEventListener('dblclick',()=>reset());
-  function reset(){yaw=home.yaw;pitch=home.pitch;zoom=home.zoom;vYaw=vPitch=0;last=-1e9}
-  document.getElementById('reset').addEventListener('click',reset);
-
-  const FLAG=[[165,25,49],[244,245,248],[45,42,74],[45,42,74],[244,245,248],[165,25,49]];
-  const t0=performance.now();
-  function frame(now){
-    const t=(now-t0)/1000,idle=now-last;
-    if(ptr.size===0){
-      yaw+=vYaw;pitch=Math.max(-.05,Math.min(1.4,pitch+vPitch));vYaw*=.93;vPitch*=.9;
-      if(!reduce&&idle>2500) yaw+=.0022*Math.min(1,(idle-2500)/1500);
-    }
-    cs=Math.cos(yaw);ss=Math.sin(yaw);cp=Math.cos(pitch);sp=Math.sin(pitch);
-    K=Math.min(W/15.8,H/9.4)*zoom;
-    const bh=reduce?99:(t/2.8)*MAXH*1.05;
-    const cy=y=>Math.min(y,bh);
-    ctx.clearRect(0,0,W,H);ctx.lineJoin='round';
-
-    /* ground: circular street grid */
-    const RG=10;ctx.lineWidth=.8;ctx.strokeStyle='rgba(255,255,255,.05)';ctx.beginPath();
-    for(let g=-9;g<=9;g+=1.5){const h=Math.sqrt(RG*RG-g*g);let a=P(g,0,-h),b=P(g,0,h);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);a=P(-h,0,g);b=P(h,0,g);ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1])}
-    ctx.stroke();
-    ctx.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;const p=P(Math.cos(a)*RG,0,Math.sin(a)*RG);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.strokeStyle='rgba(255,255,255,.16)';ctx.stroke();
-    if(!reduce){const rr=((t*.25)%1)*RG;ctx.beginPath();for(let i=0;i<=96;i++){const a=i/96*Math.PI*2;const p=P(Math.cos(a)*rr,0,Math.sin(a)*rr);i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])}ctx.strokeStyle=`rgba(255,255,255,${.22*(1-rr/RG)})`;ctx.stroke()}
-
-    /* river: Chao Phraya */
-    const zs=[];for(let z=-9.2;z<=8.6;z+=.4)zs.push(z);
-    const L1=zs.map(z=>P(xr(z)-.75,0,z)),R1=zs.map(z=>P(xr(z)+.75,0,z));
-    path([...L1,...R1.reverse()]);ctx.fillStyle='rgba(255,255,255,.045)';ctx.fill();
-    [L1,R1].forEach(bk=>{ctx.beginPath();bk.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.strokeStyle='rgba(255,255,255,.28)';ctx.lineWidth=1;ctx.stroke()});
-    ctx.lineWidth=1;
-    for(let i=0;i<36;i++){const lane=(i%3-1)*.38,z=-9.2+((i*1.31+(reduce?0:t*.45))%17.6),z2=z+.35;
-      const a=P(xr(z)+lane,0,z),b=P(xr(z2)+lane,0,z2);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.strokeStyle='rgba(255,255,255,.22)';ctx.stroke()}
-
-    /* collect + sort */
-    const D=[];
-    for(const p of PL){
-      if(p.ymin>=bh) continue;
-      const vs=p.pts.map(q=>V(q[0],cy(q[1]),q[2]));
-      const nv=Vn(p.n);
-      const c=vs.reduce((a,v)=>[a[0]+v[0]/vs.length,a[1]+v[1]/vs.length,a[2]+v[2]/vs.length],[0,0,0]);
-      const front=nv[0]*c[0]+nv[1]*c[1]+nv[2]*(c[2]+FOC)<0;
-      if(!front&&p.k!=='glass'&&p.k!=='glassc'&&p.k!=='sail') continue;
-      D.push({z:c[2],s:vs.map(S),p,front,lit:Math.max(0,dot(nv,LD))});
-    }
-    for(const l of LN){if(l.ymin>=bh)continue;const a=S(V(l.a[0],cy(l.a[1]),l.a[2])),b=S(V(l.b[0],cy(l.b[1]),l.b[2]));D.push({z:(a[2]+b[2])/2-.03,ln:[a,b],l})}
-    D.sort((a,b)=>b.z-a.z);
-
-    for(const d of D){
-      if(d.ln){ctx.beginPath();ctx.moveTo(d.ln[0][0],d.ln[0][1]);ctx.lineTo(d.ln[1][0],d.ln[1][1]);ctx.strokeStyle=`rgba(255,255,255,${d.l.al})`;ctx.lineWidth=d.l.w;ctx.stroke();continue}
-      const p=d.p,f=d.front,k=p.k,L=d.lit;
-      if(k==='flag'){
-        const [b1,b2,t2,t1]=d.s;
-        const ph=((p.fi/p.fn)+(reduce?0:t*.05))%1*5,q=ph-Math.floor(ph);
-        if(q>.93){path(d.s);ctx.fillStyle='rgba(10,10,12,.95)';ctx.fill();continue}
-        const wv=reduce?0:.045*Math.sin(q*Math.PI*3-t*3.2);
-        const br=.7+.3*L;
-        const cut=[0,1/6+wv,2/6+wv,4/6+wv,5/6+wv,1];
-        for(let s=0;s<5;s++){
-          const c=FLAG[s===2?2:s>2?s+1:s];
-          const y0=cut[s],y1=cut[s+1];
-          path([lerp(b1,t1,y0),lerp(b2,t2,y0),lerp(b2,t2,y1),lerp(b1,t1,y1)]);
-          ctx.fillStyle=`rgb(${c[0]*br|0},${c[1]*br|0},${c[2]*br|0})`;ctx.fill();
-        }
-        continue;
-      }
-      path(d.s);
-      if(k==='glassc'){ctx.fillStyle=`rgba(255,255,255,${f?.05+L*.2:.015})`;ctx.fill();continue}
-      if(k==='gtop'){ctx.fillStyle='rgba(255,255,255,.12)';ctx.fill();continue}
-      if(k==='sail'){ctx.fillStyle=`rgba(255,255,255,${f?.1+L*.32:.04})`;ctx.fill();continue}
-      if(k==='recess'){const g=12+L*55|0;ctx.fillStyle=`rgba(${g},${g},${g+2},.94)`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.42)';ctx.lineWidth=.6;ctx.stroke();continue}
-      if(k==='dark'){ctx.fillStyle='rgba(6,6,8,.95)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=.6;ctx.stroke();continue}
-      if(k==='glow'){ctx.fillStyle=`rgba(255,255,255,${.35+L*.6})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.85)';ctx.lineWidth=.6;ctx.stroke();continue}
-      if(k==='band'){ctx.fillStyle=`rgba(255,255,255,${.22+L*.4})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=.5;ctx.stroke();continue}
-      if(k==='solid'||k==='roof'){ctx.fillStyle=`rgba(${k==='roof'?'215,215,210':'255,255,255'},${.1+L*.34})`;ctx.fill();ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=.7;ctx.stroke();continue}
-      // glass prism faces
-      ctx.fillStyle=p.top?`rgba(255,255,255,${f?.1:.03})`:`rgba(255,255,255,${f?.05+L*.2:.015})`;ctx.fill();
-      ctx.strokeStyle=`rgba(255,255,255,${f?.7:.12})`;ctx.lineWidth=f?.9:.5;ctx.stroke();
-    }
-
-    /* beacons */
-    const blink=reduce?1:(Math.sin(t*3)>.2?1:.25);
-    BEACONS.forEach(([x,y,z],i)=>{if(bh<y-.2)return;const p=P(x,y,z);const r=8*Math.min(2,Math.sqrt(zoom));const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],r);const b=i%2?1-blink*.6:blink;g.addColorStop(0,`rgba(255,255,255,${.9*b})`);g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],r,0,7);ctx.fill()});
-
-    /* labels */
-    if(bh>MAXH*.92){
-      const a=Math.min(1,(bh-MAXH*.92)/1.2);
-      ctx.font=lang==='th'?'500 10.5px "IBM Plex Sans Thai", system-ui, sans-serif':'500 9.5px "JetBrains Mono", ui-monospace, monospace';ctx.textAlign='center';
-      LB.forEach(l=>{const [x,y,z]=l.p;const p=P(x,y,z),q=P(x,y+.3,z);
-        ctx.strokeStyle=`rgba(255,255,255,${.35*a})`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]-3);ctx.stroke();
-        const tx=lang==='th'?l.th:l.en.toUpperCase(),tw=ctx.measureText(tx).width+10,qx=Math.max(tw/2+4,Math.min(W-tw/2-4,q[0]));
-        ctx.fillStyle=`rgba(0,0,0,${.6*a})`;ctx.fillRect(qx-tw/2,q[1]-18,tw,14);
-        ctx.fillStyle=`rgba(255,255,255,${.92*a})`;ctx.fillText(tx,qx,q[1]-7)});
-    }
-
-    for(let i=0;i<60;i++){const x=(hash(i,1,2)-.5)*18,z=(hash(i,3,4)-.5)*16,y=(hash(i,5,6)*7+(reduce?0:t*.12))%7;const p=P(x,y,z);ctx.fillStyle=`rgba(255,255,255,${.1+hash(i,7,8)*.3})`;ctx.fillRect(p[0],p[1],1.3,1.3)}
-    requestAnimationFrame(frame);
-  }
+let lang='en';
+const v=new THREE.Vector3(),clock=new THREE.Clock();
+const ease=t=>1-Math.pow(1-t,3);
+function frame(){
+  const t=clock.getElapsedTime(),w=stage.clientWidth,h=stage.clientHeight;
+  BUILD.forEach(b=>{if(reduce)return;const k=Math.min(1,Math.max(0,(t-b.delay)/1.4));b.g.scale.y=Math.max(.001,ease(k))});
+  drawFlag(reduce?0:t);
+  if(!reduce)flowTex.offset.y-=.0035;
+  BEACONS.forEach((m,i)=>{const p=reduce?1:.55+.45*Math.max(0,Math.sin(t*2.6+i));m.material.opacity=p;m.material.transparent=true;m.scale.setScalar(.8+p*.6)});
+  controls.update();
+  composer.render();
+  const show=reduce||t>2.4;
+  LABELS.forEach(l=>{v.copy(l.p);l.parent.localToWorld(v);v.project(camera);
+    const vis=show&&v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+    l.el.style.opacity=vis?1:0;
+    if(vis)l.el.style.transform=`translate(${(v.x*.5+.5)*w}px,${(-v.y*.5+.5)*h}px) translate(-50%,-100%)`});
   requestAnimationFrame(frame);
-  return {setLang:l=>{lang=l}};
-})();
+}
+drawFlag(0);requestAnimationFrame(frame);
 
+window.SKY={setLang(l){lang=l;LABELS.forEach(x=>x.el.textContent=l==='th'?x.th:x.en)}};
+if(document.documentElement.lang==='th')window.SKY.setLang('th');
 </script>
 </body>
 </html>
