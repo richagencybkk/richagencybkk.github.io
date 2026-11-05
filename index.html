@@ -3,1275 +3,618 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>RICH AGENCY — Luxury Condo Rentals · Bangkok</title>
-  <meta name="description" content="Rich Agency curates Bangkok's finest luxury condominium rentals. Private viewings and bespoke residence advisory in Sukhumvit, Sathorn, Wireless Road, and the Chao Phraya riverfront.">
-  <meta name="theme-color" content="#070709">
+  <title>RICH AGENCY — Condo Rentals · Bangkok</title>
+  <meta name="description" content="Rich Agency — luxury condos for rent in Bangkok. Message us on WhatsApp or LINE to find your next condo rental.">
+  <meta name="theme-color" content="#000000">
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="RICH AGENCY — Luxury Condo Rentals · Bangkok">
-  <meta property="og:description" content="Find your next home in Bangkok. Exclusive luxury condominium rentals curated by Rich Agency.">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Rich Agency Bangkok">
   <meta property="og:url" content="https://richagencybkk.github.io/">
+  <meta property="og:site_name" content="Rich Agency Bangkok">
+  <meta property="og:title" content="RICH AGENCY — Condo Rentals · Bangkok">
+  <meta property="og:description" content="Luxury condos for rent in Bangkok. Message us on WhatsApp or LINE to find yours.">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RICH AGENCY — Condo Rentals · Bangkok">
+  <meta name="twitter:description" content="Luxury condos for rent in Bangkok. Message us to find yours.">
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-deep: #060608;
-      --bg-obsidian: #0b0b10;
+      --black: #000;
+      --ink: #0a0a0a;
+      --text: #f3efe7;
+      --text-soft: rgba(243, 239, 231, 0.72);
+      --text-faint: rgba(243, 239, 231, 0.42);
       --gold: #c9a96e;
-      --gold-bright: #e5cb96;
-      --gold-dim: rgba(201, 169, 110, 0.28);
-      --gold-border: rgba(201, 169, 110, 0.34);
-      --gold-glow: rgba(201, 169, 110, 0.22);
-      --text-primary: #f6f2eb;
-      --text-secondary: rgba(246, 242, 235, 0.72);
-      --text-muted: rgba(246, 242, 235, 0.42);
-      --card-bg: rgba(12, 12, 16, 0.56);
-      --font-serif: 'Cormorant Garamond', Georgia, serif;
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --gold-soft: rgba(201, 169, 110, 0.32);
+      --gold-faint: rgba(201, 169, 110, 0.14);
+      --serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       width: 100%;
-      min-height: 100%;
-      background-color: var(--bg-deep);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      max-width: 100%;
       overflow-x: hidden;
       overflow-x: clip;
-      max-width: 100%;
-    }
-
-    ::selection {
-      background: rgba(201, 169, 110, 0.3);
-      color: var(--text-primary);
     }
 
     body {
-      position: relative;
       min-height: 100vh;
       min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      /* Dark gold architectural fallback gradient if WebGL is unavailable */
-      background:
-        radial-gradient(110% 80% at 50% 18%, rgba(201, 169, 110, 0.14) 0%, rgba(20, 17, 13, 0.45) 42%, rgba(6, 6, 8, 0.98) 100%),
-        radial-gradient(65% 55% at 50% 85%, rgba(201, 169, 110, 0.08) 0%, transparent 75%),
-        linear-gradient(180deg, #09080c 0%, #050507 65%, #08070a 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-tap-highlight-color: transparent;
+      /* Static black-gold gradient: shown when WebGL is off, fails, or reduced motion is on */
+      background-color: var(--black);
+      background-image:
+        radial-gradient(120% 70% at 50% 108%, rgba(201, 169, 110, 0.16) 0%, rgba(201, 169, 110, 0.04) 40%, transparent 70%),
+        radial-gradient(80% 50% at 50% 0%, rgba(201, 169, 110, 0.07) 0%, transparent 70%),
+        linear-gradient(180deg, #000 0%, #070605 60%, #0b0907 100%);
+      background-attachment: fixed;
     }
 
-    body.webgl-fallback::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      background:
-        repeating-linear-gradient(90deg, rgba(201, 169, 110, 0.03) 0px, rgba(201, 169, 110, 0.03) 1px, transparent 1px, transparent 72px),
-        radial-gradient(circle at 50% 32%, rgba(201, 169, 110, 0.20), transparent 62%);
-    }
+    ::selection { background: rgba(201, 169, 110, 0.3); color: var(--text); }
 
-    /* Fullscreen 3D Canvas — strictly non-blocking */
-    #skyline-canvas {
+    /* ---------- Background layers (never block taps) ---------- */
+    #scene {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
+      display: block;
       z-index: 0;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 2.8s cubic-bezier(0.33, 1, 0.68, 1);
+      transition: opacity 2.6s var(--ease);
     }
+    #scene.ready { opacity: 1; }
 
-    #skyline-canvas.is-ready {
-      opacity: 1;
-    }
-
-    /* Subtle atmospheric vignette & film grain — strictly non-blocking */
-    .vignette-overlay {
+    .shade {
       position: fixed;
       inset: 0;
       z-index: 1;
       pointer-events: none;
       background:
-        radial-gradient(circle at 50% 45%, transparent 32%, rgba(5, 5, 7, 0.66) 100%),
-        linear-gradient(180deg, rgba(5, 5, 7, 0.55) 0%, transparent 24%, transparent 72%, rgba(5, 5, 7, 0.85) 100%);
+        radial-gradient(ellipse 90% 70% at 50% 50%, transparent 40%, rgba(0, 0, 0, 0.7) 100%),
+        linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 22%, transparent 70%, rgba(0, 0, 0, 0.8) 100%);
     }
 
-    .grain-overlay {
+    .grain {
       position: fixed;
       inset: 0;
       z-index: 2;
       pointer-events: none;
-      opacity: 0.038;
+      opacity: 0.05;
       mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      animation: grainShift 7s steps(8) infinite;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+      animation: grain 6s steps(6) infinite;
     }
-
-    @keyframes grainShift {
+    @keyframes grain {
       0%, 100% { background-position: 0 0; }
-      20% { background-position: -37px 23px; }
-      40% { background-position: 29px -41px; }
-      60% { background-position: -23px -31px; }
-      80% { background-position: 43px 13px; }
+      17% { background-position: -31px 19px; }
+      33% { background-position: 23px -37px; }
+      50% { background-position: -17px -23px; }
+      67% { background-position: 41px 11px; }
+      83% { background-position: -9px 33px; }
     }
 
-    /* Custom smooth cursor (Desktop only) */
-    .custom-cursor-dot,
-    .custom-cursor-ring {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate3d(-100px, -100px, 0);
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .custom-cursor-dot {
-        display: block;
-        width: 5px;
-        height: 5px;
-        margin-left: -2.5px;
-        margin-top: -2.5px;
-        border-radius: 50%;
-        background: var(--gold-bright);
-        box-shadow: 0 0 10px var(--gold);
-        transition: transform 0.15s ease, opacity 0.25s ease;
-      }
-
-      .custom-cursor-ring {
-        display: block;
-        width: 34px;
-        height: 34px;
-        margin-left: -17px;
-        margin-top: -17px;
-        border-radius: 50%;
-        border: 1px solid rgba(201, 169, 110, 0.45);
-        background: rgba(201, 169, 110, 0.03);
-        transition: width 0.35s var(--ease-out-expo),
-                    height 0.35s var(--ease-out-expo),
-                    margin 0.35s var(--ease-out-expo),
-                    border-color 0.35s ease,
-                    background-color 0.35s ease;
-      }
-
-      .custom-cursor-ring.is-hovering {
-        width: 56px;
-        height: 56px;
-        margin-left: -28px;
-        margin-top: -28px;
-        border-color: rgba(229, 203, 150, 0.85);
-        background: rgba(201, 169, 110, 0.10);
-      }
-    }
-
-    /* Foreground UI Layout */
-    .page-shell {
+    /* ---------- Layout ---------- */
+    .page {
       position: relative;
       z-index: 5;
-      width: 100%;
       min-height: 100vh;
       min-height: 100svh;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       padding:
-        max(1.75rem, env(safe-area-inset-top, 0px))
+        max(28px, env(safe-area-inset-top, 0px))
         max(20px, env(safe-area-inset-right, 0px))
-        max(1.4rem, env(safe-area-inset-bottom, 0px))
+        max(22px, env(safe-area-inset-bottom, 0px))
         max(20px, env(safe-area-inset-left, 0px));
     }
 
-    .top-bar {
+    main {
       width: 100%;
-      max-width: 1200px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-top: 0.25rem;
-      opacity: 0;
-      animation: fadeSlideIn 1.4s var(--ease-out-expo) 0.2s forwards;
-    }
-
-    .top-monogram {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.65rem;
-      font-size: 0.68rem;
-      letter-spacing: 0.34em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .top-monogram::before,
-    .top-monogram::after {
-      content: "";
-      width: 18px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    }
-
-    /* Center Hero Content */
-    .hero-main {
-      width: 100%;
-      max-width: 780px;
+      max-width: 460px;
       margin: auto 0;
+      padding: 32px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      padding: 2rem 0;
     }
 
-    /* Brand Title: Blur-to-sharp letter reveal */
-    .brand-title {
-      font-family: var(--font-serif);
-      font-weight: 300;
-      font-size: clamp(1.6rem, 8.2vw, 5.75rem);
-      line-height: 1.04;
-      letter-spacing: 0.28em;
-      padding-left: 0.28em; /* Optical balance for wide letter-spacing */
-      text-transform: uppercase;
-      color: var(--text-primary);
-      text-shadow: 0 12px 42px rgba(0, 0, 0, 0.75);
-      margin-bottom: 1.15rem;
+    /* ---------- Brand ---------- */
+    .brand {
       display: flex;
+      justify-content: center;
       flex-wrap: nowrap;
       white-space: nowrap;
-      justify-content: center;
       max-width: 100%;
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: clamp(1.75rem, 8.6vw, 5.25rem);
+      line-height: 1;
+      letter-spacing: 0.16em;
+      padding-left: 0.16em; /* optically re-centre the trailing letter-spacing */
+      text-transform: uppercase;
+      color: var(--text);
+      text-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    }
+    @media (min-width: 640px) {
+      .brand { letter-spacing: 0.26em; padding-left: 0.26em; }
+      main { max-width: 760px; }
     }
 
-    @media (max-width: 600px) {
-      .brand-title {
-        letter-spacing: 0.16em;
-        padding-left: 0.16em;
-      }
-    }
-
-    .brand-title .char {
+    .brand span {
       display: inline-block;
       opacity: 0;
       filter: blur(10px);
-      transform: translateY(10px);
-      animation: charReveal 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-      animation-delay: calc(0.35s + var(--char-index, 0) * 0.07s);
-      will-change: transform, opacity, filter;
+      transform: translateY(0.18em);
+      animation: reveal 1.6s var(--ease) forwards;
+      animation-delay: calc(0.5s + var(--i) * 0.075s);
+    }
+    .brand .gap { width: 0.38em; }
+
+    @keyframes reveal {
+      55% { opacity: 1; }
+      100% { opacity: 1; filter: blur(0); transform: none; }
     }
 
-    .brand-title .char-space {
-      width: 0.42em;
-    }
-
-    @keyframes charReveal {
-      0% {
-        opacity: 0;
-        filter: blur(10px);
-        transform: translateY(10px);
-      }
-      55% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 1;
-        filter: blur(0px);
-        transform: translateY(0);
-      }
-    }
-
-    /* Small caps subtitle with animated gold line drawing beside it */
-    .subtitle-row {
+    .tagline {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: clamp(0.65rem, 2.2vw, 1.25rem);
-      margin-bottom: clamp(2.2rem, 5vh, 3.4rem);
+      gap: 14px;
       width: 100%;
+      margin-top: 18px;
+      opacity: 0;
+      animation: rise 1.4s var(--ease) 1.25s forwards;
     }
-
-    .gold-draw-line {
-      position: relative;
-      display: block;
-      flex-shrink: 0;
-      width: clamp(18px, 6vw, 76px);
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright));
-      transform: scaleX(0);
-      transform-origin: right center;
-      animation: drawGoldLine 1.5s var(--ease-out-expo) 0.95s forwards;
-    }
-
-    .gold-draw-line.right {
-      background: linear-gradient(90deg, var(--gold-bright), var(--gold), transparent);
-      transform-origin: left center;
-    }
-
-    .gold-draw-line::after {
-      content: "";
-      position: absolute;
-      top: -1.5px;
-      right: 0;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: var(--gold-bright);
-      box-shadow: 0 0 8px var(--gold);
-    }
-
-    .gold-draw-line.right::after {
-      right: auto;
-      left: 0;
-    }
-
-    @keyframes drawGoldLine {
-      0% {
-        transform: scaleX(0);
-        opacity: 0;
-      }
-      100% {
-        transform: scaleX(1);
-        opacity: 1;
-      }
-    }
-
-    .brand-subtitle {
-      font-family: var(--font-sans);
-      font-size: clamp(0.68rem, 1.8vw, 0.82rem);
+    .tagline p {
+      font-size: 0.68rem;
       font-weight: 400;
-      letter-spacing: 0.34em;
-      padding-left: 0.34em;
-      font-variant: small-caps;
-      text-transform: uppercase;
-      color: var(--gold-bright);
-      opacity: 0;
-      animation: fadeSlideIn 1.3s var(--ease-out-expo) 0.85s forwards;
+      letter-spacing: 0.32em;
+      padding-left: 0.32em;
       white-space: nowrap;
+      color: var(--gold);
     }
-
-    @media (max-width: 400px) {
-      .brand-subtitle {
-        letter-spacing: 0.2em;
-        padding-left: 0.2em;
-        font-size: 0.62rem;
-      }
+    .tagline i {
+      display: block;
+      flex: 0 0 auto;
+      width: clamp(16px, 7vw, 56px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold));
+      transform: scaleX(0);
+      transform-origin: right;
+      animation: draw 1.6s var(--ease) 1.45s forwards;
     }
-
-    @media (max-width: 350px) {
-      .gold-draw-line { display: none; }
+    .tagline i:last-child {
+      background: linear-gradient(90deg, var(--gold), transparent);
+      transform-origin: left;
     }
+    @keyframes draw { to { transform: scaleX(1); } }
+    @media (max-width: 340px) { .tagline i { display: none; } }
 
-    /* Glassmorphism Contact Card with 3D Tilt & Moving Light Sheen */
-    .card-perspective {
+    /* ---------- Contact card ---------- */
+    .card-wrap {
       position: relative;
-      perspective: 1100px;
       width: 100%;
-      max-width: 470px;
+      max-width: 420px;
+      margin-top: clamp(36px, 7svh, 64px);
       opacity: 0;
-      animation: cardEntrance 1.8s cubic-bezier(0.22, 1, 0.36, 1) 1.3s forwards;
+      animation: rise 1.6s var(--ease) 1.7s forwards;
     }
-
-    /* Dark readability halo behind the card */
-    .card-perspective::before {
+    /* dark halo so the card stays readable over the towers */
+    .card-wrap::before {
       content: "";
       position: absolute;
-      inset: -56px 0;
+      inset: -60px -10px;
       z-index: -1;
       pointer-events: none;
-      background: radial-gradient(closest-side, rgba(4, 4, 6, 0.78), rgba(4, 4, 6, 0.4) 60%, transparent);
-      transform: scale(1.25, 1.15);
+      background: radial-gradient(closest-side, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.5) 60%, transparent);
     }
 
-    @media (max-width: 600px) {
-      .card-perspective::before {
-        background: radial-gradient(closest-side, rgba(4, 4, 6, 0.88), rgba(4, 4, 6, 0.55) 60%, transparent);
-      }
-    }
-
-    @keyframes cardEntrance {
-      0% {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .contact-card {
+    .card {
       position: relative;
-      width: 100%;
-      padding: clamp(1.85rem, 5vw, 2.65rem) clamp(1.4rem, 4.5vw, 2.4rem);
-      border-radius: 20px;
-      background:
-        linear-gradient(145deg, rgba(255, 248, 236, 0.075) 0%, rgba(255, 248, 236, 0.02) 45%, rgba(10, 10, 14, 0.5) 100%),
-        rgba(14, 13, 18, 0.55);
-      backdrop-filter: blur(26px) saturate(150%);
-      -webkit-backdrop-filter: blur(26px) saturate(150%);
-      border: 1px solid rgba(201, 169, 110, 0.26);
-      box-shadow:
-        0 28px 68px -16px rgba(0, 0, 0, 0.82),
-        0 0 30px -12px rgba(201, 169, 110, 0.1),
-        inset 0 1px 0 0 rgba(255, 243, 219, 0.22),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-      transform-style: preserve-3d;
-      transition: transform 0.22s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
       overflow: hidden;
-    }
-
-    .contact-card:hover {
-      border-color: rgba(201, 169, 110, 0.56);
+      padding: 30px 22px 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(201, 169, 110, 0.22);
+      background:
+        linear-gradient(150deg, rgba(255, 250, 240, 0.07) 0%, rgba(255, 250, 240, 0.015) 45%, rgba(0, 0, 0, 0.35) 100%),
+        rgba(12, 11, 10, 0.55);
+      -webkit-backdrop-filter: blur(22px) saturate(140%);
+      backdrop-filter: blur(22px) saturate(140%);
       box-shadow:
-        0 32px 75px -14px rgba(0, 0, 0, 0.88),
-        0 0 46px -8px rgba(201, 169, 110, 0.22),
-        inset 0 1px 0 0 rgba(255, 243, 219, 0.25);
+        0 30px 70px -20px rgba(0, 0, 0, 0.9),
+        inset 0 1px 0 rgba(255, 244, 222, 0.14);
     }
+    @media (min-width: 640px) { .card { padding: 40px 36px 32px; } }
 
-    /* Ambient moving light sheen across the glass card */
-    .card-sheen {
+    .card::after { /* moving light sheen */
+      content: "";
       position: absolute;
-      inset: -60%;
+      top: -50%;
+      bottom: -50%;
+      left: -60%;
+      width: 50%;
       pointer-events: none;
-      background: linear-gradient(
-        115deg,
-        transparent 38%,
-        rgba(201, 169, 110, 0.08) 47%,
-        rgba(255, 245, 224, 0.16) 50%,
-        rgba(201, 169, 110, 0.08) 53%,
-        transparent 62%
-      );
-      transform: translateX(-70%) rotate(8deg);
-      animation: sheenSweep 8.5s ease-in-out infinite;
+      background: linear-gradient(100deg, transparent, rgba(255, 240, 210, 0.07) 45%, rgba(255, 240, 210, 0.12) 50%, rgba(255, 240, 210, 0.07) 55%, transparent);
+      transform: translateX(0) rotate(12deg);
+      animation: sheen 9s ease-in-out 3.2s infinite;
+    }
+    @keyframes sheen {
+      0% { transform: translateX(0) rotate(12deg); }
+      45%, 100% { transform: translateX(440%) rotate(12deg); }
     }
 
-    @keyframes sheenSweep {
-      0%, 22% {
-        transform: translateX(-75%) rotate(8deg);
-      }
-      58%, 100% {
-        transform: translateX(75%) rotate(8deg);
-      }
-    }
-
-    /* Cursor spotlight inside card */
-    .card-glow-spot {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: radial-gradient(
-        340px circle at var(--spot-x, 50%) var(--spot-y, 20%),
-        rgba(201, 169, 110, 0.13),
-        transparent 70%
-      );
-      opacity: 0.85;
-    }
-
-    .card-inner {
+    .card-text {
       position: relative;
-      z-index: 2;
+      z-index: 1;
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(1.3rem, 5.4vw, 1.6rem);
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 26px;
+    }
+
+    .buttons {
+      position: relative;
+      z-index: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 1.65rem;
+      gap: 12px;
     }
 
-    .card-headline {
-      font-family: var(--font-serif);
-      font-weight: 400;
-      font-size: clamp(1.38rem, 3.6vw, 1.75rem);
-      line-height: 1.32;
-      letter-spacing: 0.03em;
-      color: var(--text-primary);
-    }
-
-    /* CTA Buttons */
-    .cta-group {
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.9rem;
-    }
-
-    @media (max-width: 600px) {
-      .cta-group {
-        grid-template-columns: 1fr;
-      }
-      .luxury-btn {
-        min-height: 56px;
-        font-size: 0.84rem;
-      }
-    }
-
-    .luxury-btn {
+    .btn {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.65rem;
+      gap: 12px;
       width: 100%;
-      min-height: 52px;
-      padding: 0.85rem 1.25rem;
+      min-height: 56px;
+      padding: 14px 20px;
       border-radius: 12px;
-      border: 1px solid rgba(201, 169, 110, 0.32);
-      background: rgba(15, 14, 19, 0.6);
-      color: var(--text-primary);
-      text-decoration: none;
-      font-family: var(--font-sans);
+      border: 1px solid var(--gold-soft);
+      background: rgba(0, 0, 0, 0.45);
+      color: var(--text);
+      font-family: var(--sans);
       font-size: 0.82rem;
       font-weight: 500;
-      letter-spacing: 0.16em;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      text-decoration: none;
       overflow: hidden;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition:
-        color 0.4s var(--ease-out-expo),
-        border-color 0.4s var(--ease-out-expo),
-        box-shadow 0.4s var(--ease-out-expo),
-        transform 0.25s ease-out;
+      touch-action: manipulation;
+      transition: color 0.45s var(--ease), border-color 0.45s var(--ease), box-shadow 0.45s var(--ease), transform 0.2s ease;
     }
-
-    /* Gold fill sweep on hover/tap */
-    .luxury-btn::before {
+    .btn::before {
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(110deg, rgba(201, 169, 110, 0.10) 0%, rgba(229, 203, 150, 0.2) 50%, rgba(201, 169, 110, 0.12) 100%);
+      background: linear-gradient(105deg, rgba(201, 169, 110, 0.08), rgba(201, 169, 110, 0.2) 50%, rgba(201, 169, 110, 0.08));
       transform: scaleX(0);
-      transform-origin: right center;
-      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-      z-index: 0;
+      transform-origin: left;
+      transition: transform 0.6s var(--ease);
     }
+    .btn > * { position: relative; }
+    .btn svg { width: 20px; height: 20px; fill: currentColor; flex-shrink: 0; }
 
-    .luxury-btn:hover::before,
-    .luxury-btn:focus-visible::before,
-    .luxury-btn:active::before {
-      transform: scaleX(1);
-      transform-origin: left center;
-    }
-
-    .luxury-btn:hover,
-    .luxury-btn:focus-visible,
-    .luxury-btn:active {
-      color: var(--gold-bright);
-      border-color: rgba(229, 203, 150, 0.7);
-      box-shadow:
-        0 0 22px -4px rgba(201, 169, 110, 0.28),
-        0 8px 22px -6px rgba(0, 0, 0, 0.65);
+    .btn:hover, .btn:focus-visible, .btn:active {
+      color: #f1dcb1;
+      border-color: rgba(201, 169, 110, 0.75);
+      box-shadow: 0 0 24px -4px rgba(201, 169, 110, 0.35), inset 0 0 12px rgba(201, 169, 110, 0.08);
       outline: none;
     }
+    .btn:hover::before, .btn:focus-visible::before, .btn:active::before { transform: scaleX(1); }
+    .btn:active { transform: scale(0.985); }
 
-    .luxury-btn .btn-content {
-      position: relative;
-      z-index: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      pointer-events: none;
-    }
-
-    .luxury-btn svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-      fill: currentColor;
-      transition: transform 0.35s var(--ease-out-expo);
-    }
-
-    .luxury-btn:hover svg {
-      transform: scale(1.1);
-    }
-
-    /* Footer */
-    .site-footer {
-      width: 100%;
-      text-align: center;
-      padding-bottom: 0.2rem;
-      font-size: 0.7rem;
-      font-weight: 300;
-      letter-spacing: 0.22em;
+    footer {
+      font-size: 0.66rem;
+      letter-spacing: 0.24em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--text-faint);
+      text-align: center;
       opacity: 0;
-      animation: fadeSlideIn 1.4s var(--ease-out-expo) 1.4s forwards;
+      animation: rise 1.4s var(--ease) 2.1s forwards;
     }
 
-    @keyframes fadeSlideIn {
-      0% {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
     }
 
-    /* Reduced Motion Accessibility */
+    /* ---------- Reduced motion: static, everything visible ---------- */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-delay: 0ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        animation: none !important;
+        transition: none !important;
       }
-
-      .brand-title .char,
-      .brand-subtitle,
-      .card-perspective,
-      .top-bar,
-      .site-footer {
+      .brand span, .tagline, .card-wrap, footer {
         opacity: 1 !important;
         filter: none !important;
         transform: none !important;
       }
-
-      .gold-draw-line {
-        transform: scaleX(1) !important;
-        opacity: 1 !important;
-      }
-
-      #skyline-canvas {
-        opacity: 1 !important;
-      }
-
-      .grain-overlay,
-      .card-sheen {
-        animation: none !important;
-      }
+      .tagline i { transform: none !important; }
+      .card::after { display: none; }
+      #scene { display: none; }
     }
   </style>
 </head>
 <body>
-  <!-- 3D Bangkok Skyline Canvas -->
-  <canvas id="skyline-canvas" aria-hidden="true"></canvas>
+  <canvas id="scene" aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <!-- Atmospheric Overlays (pointer-events: none) -->
-  <div class="vignette-overlay" aria-hidden="true"></div>
-  <div class="grain-overlay" aria-hidden="true"></div>
+  <div class="page">
+    <span aria-hidden="true"></span>
 
-  <!-- Custom Smooth Cursor (Desktop only) -->
-  <div class="custom-cursor-dot" id="cursor-dot" aria-hidden="true"></div>
-  <div class="custom-cursor-ring" id="cursor-ring" aria-hidden="true"></div>
+    <main>
+      <h1 class="brand" aria-label="RICH AGENCY"><span style="--i:0" aria-hidden="true">R</span><span style="--i:1" aria-hidden="true">I</span><span style="--i:2" aria-hidden="true">C</span><span style="--i:3" aria-hidden="true">H</span><span class="gap" style="--i:4" aria-hidden="true"></span><span style="--i:5" aria-hidden="true">A</span><span style="--i:6" aria-hidden="true">G</span><span style="--i:7" aria-hidden="true">E</span><span style="--i:8" aria-hidden="true">N</span><span style="--i:9" aria-hidden="true">C</span><span style="--i:10" aria-hidden="true">Y</span></h1>
 
-  <!-- Foreground UI -->
-  <div class="page-shell">
-    <header class="top-bar">
-      <span class="top-monogram">Private Residence Advisory</span>
-    </header>
-
-    <main class="hero-main">
-      <h1 class="brand-title" aria-label="RICH AGENCY">
-        <span class="char" style="--char-index:0" aria-hidden="true">R</span><span class="char" style="--char-index:1" aria-hidden="true">I</span><span class="char" style="--char-index:2" aria-hidden="true">C</span><span class="char" style="--char-index:3" aria-hidden="true">H</span><span class="char char-space" style="--char-index:4" aria-hidden="true">&nbsp;</span><span class="char" style="--char-index:5" aria-hidden="true">A</span><span class="char" style="--char-index:6" aria-hidden="true">G</span><span class="char" style="--char-index:7" aria-hidden="true">E</span><span class="char" style="--char-index:8" aria-hidden="true">N</span><span class="char" style="--char-index:9" aria-hidden="true">C</span><span class="char" style="--char-index:10" aria-hidden="true">Y</span>
-      </h1>
-
-      <div class="subtitle-row">
-        <span class="gold-draw-line left" aria-hidden="true"></span>
-        <p class="brand-subtitle">LUXURY CONDO RENTALS · BANGKOK</p>
-        <span class="gold-draw-line right" aria-hidden="true"></span>
+      <div class="tagline">
+        <i aria-hidden="true"></i>
+        <p>CONDO RENTALS · BANGKOK</p>
+        <i aria-hidden="true"></i>
       </div>
 
-      <div class="card-perspective">
-        <section class="contact-card" id="contact-card" aria-label="Contact Rich Agency">
-          <div class="card-sheen" aria-hidden="true"></div>
-          <div class="card-glow-spot" id="card-glow-spot" aria-hidden="true"></div>
-          <div class="card-inner">
-            <h2 class="card-headline">Find your next home in Bangkok.</h2>
-            <div class="cta-group">
-              <a
-                href="https://wa.me/66918157214"
-                class="luxury-btn"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Contact Rich Agency on WhatsApp"
-              >
-                <span class="btn-content">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.82 14.01c-.24.68-1.41 1.3-1.95 1.38-.5.08-1.13.11-1.82-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.79-4.18-4.94-4.37-.14-.19-1.18-1.57-1.18-2.99 0-1.42.74-2.12 1.01-2.41.26-.29.58-.36.77-.36.19 0 .38.01.55.01.18 0 .41-.07.64.49.24.58.82 2 .89 2.14.07.14.12.31.02.5-.1.19-.15.31-.29.48-.14.17-.3.38-.43.51-.14.14-.29.3-.13.58.17.29.75 1.23 1.61 2 .89.79 1.64 1.04 1.93 1.18.29.14.46.12.63-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.65-.14.26.1 1.68.79 1.97.94.29.14.48.22.55.34.07.12.07.7-.17 1.38z"/>
-                  </svg>
-                  <span>WhatsApp</span>
-                </span>
-              </a>
-
-              <a
-                href="https://line.me/ti/p/~Peji_org"
-                class="luxury-btn"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Contact Rich Agency on LINE"
-              >
-                <span class="btn-content">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
-                  </svg>
-                  <span>LINE</span>
-                </span>
-              </a>
-            </div>
+      <div class="card-wrap">
+        <section class="card" aria-label="Contact Rich Agency">
+          <p class="card-text">Luxury condos for rent in Bangkok. Message us to find yours.</p>
+          <div class="buttons">
+            <a class="btn" href="https://wa.me/66918157214" target="_blank" rel="noopener noreferrer" aria-label="Message Rich Agency on WhatsApp">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm0 18.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.26 8.26 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.23 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.14-1.18-.06-.1-.23-.16-.48-.29z"/></svg>
+              <span>WhatsApp</span>
+            </a>
+            <a class="btn" href="https://line.me/ti/p/~Peji_org" target="_blank" rel="noopener noreferrer" aria-label="Message Rich Agency on LINE">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+              <span>LINE</span>
+            </a>
           </div>
         </section>
       </div>
     </main>
 
-    <footer class="site-footer">
-      © Rich Agency Bangkok
-    </footer>
+    <footer>© Rich Agency Bangkok</footer>
   </div>
 
-  <!-- Three.js Classic UMD Build from cdnjs -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
-    (function () {
-      'use strict';
+  (function () {
+    'use strict';
 
-      var prefersReducedMotion = window.matchMedia &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var isFinePointer = window.matchMedia &&
-        window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-      var isMobile = window.innerWidth < 768 || !isFinePointer;
-      var isPortrait = window.innerWidth / window.innerHeight < 0.85;
-      var maxDpr = isMobile ? 1.5 : 2;
+    var mq = function (q) { return window.matchMedia && window.matchMedia(q).matches; };
+    if (mq('(prefers-reduced-motion: reduce)')) return;          // static gradient only
+    if (typeof window.THREE === 'undefined') return;             // CDN failed → static gradient
 
-      /* --------------------------------------------------------
-       * 1. Custom Smooth Cursor + Magnetic Buttons + Card 3D Tilt
-       * -------------------------------------------------------- */
-      var cursorDot = document.getElementById('cursor-dot');
-      var cursorRing = document.getElementById('cursor-ring');
-      var contactCard = document.getElementById('contact-card');
-      var cardGlowSpot = document.getElementById('card-glow-spot');
-      var buttons = document.querySelectorAll('.luxury-btn');
+    var canvas = document.getElementById('scene');
+    var finePointer = mq('(hover: hover) and (pointer: fine)');
+    var mobile = !finePointer || window.innerWidth < 768;
+    var portrait = window.innerWidth / window.innerHeight < 0.85;
 
-      var mouseX = window.innerWidth * 0.5;
-      var mouseY = window.innerHeight * 0.5;
-      var ringX = mouseX;
-      var ringY = mouseY;
-      var normX = 0; // -1 to 1
-      var normY = 0; // -1 to 1
+    var renderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !mobile, powerPreference: 'high-performance' });
+    } catch (e) { return; }                                      // no WebGL → static gradient
+    if (!renderer.getContext()) return;
 
-      if (isFinePointer && !prefersReducedMotion) {
-        window.addEventListener('mousemove', function (e) {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-          normX = (e.clientX / window.innerWidth - 0.5) * 2;
-          normY = (e.clientY / window.innerHeight - 0.5) * 2;
+    var DPR = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
+    renderer.setPixelRatio(DPR);
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.setClearColor(0x000000, 1);
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
-          if (cursorDot) {
-            cursorDot.style.transform = 'translate3d(' + mouseX + 'px, ' + mouseY + 'px, 0)';
-          }
-        }, { passive: true });
+    var scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000000, portrait ? 0.03 : 0.036);
 
-        var updateCursorRing = function () {
-          ringX += (mouseX - ringX) * 0.16;
-          ringY += (mouseY - ringY) * 0.16;
-          if (cursorRing) {
-            cursorRing.style.transform = 'translate3d(' + ringX.toFixed(2) + 'px, ' + ringY.toFixed(2) + 'px, 0)';
-          }
-          requestAnimationFrame(updateCursorRing);
-        };
-        requestAnimationFrame(updateCursorRing);
-      }
+    var camera = new THREE.PerspectiveCamera(portrait ? 56 : 44, window.innerWidth / window.innerHeight, 0.5, 140);
 
-      /* Card 3D tilt & inner spotlight */
-      if (contactCard && isFinePointer && !prefersReducedMotion) {
-        contactCard.addEventListener('mousemove', function (e) {
-          var rect = contactCard.getBoundingClientRect();
-          var x = e.clientX - rect.left;
-          var y = e.clientY - rect.top;
-          var pctX = (x / rect.width) - 0.5;
-          var pctY = (y / rect.height) - 0.5;
-          var rotX = (-pctY * 10).toFixed(2);
-          var rotY = (pctX * 12).toFixed(2);
+    /* Camera path: starts close, pulls back. On portrait phones the camera sits
+       lower and further back, looking up, so the towers frame the text. */
+    var CAM = portrait
+      ? { z0: 15, z1: 31, y0: 2.2, y1: 2.8, look: 8.5, sway: 0.8 }
+      : { z0: 12, z1: 24, y0: 4.0, y1: 5.2, look: 5.0, sway: 1.4 };
+    camera.position.set(0, CAM.y0, CAM.z0);
+    camera.lookAt(0, CAM.look, -6);
 
-          contactCard.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
-          if (cardGlowSpot) {
-            cardGlowSpot.style.setProperty('--spot-x', ((x / rect.width) * 100).toFixed(1) + '%');
-            cardGlowSpot.style.setProperty('--spot-y', ((y / rect.height) * 100).toFixed(1) + '%');
-          }
-        }, { passive: true });
+    /* Light */
+    scene.add(new THREE.AmbientLight(0x1a1712, 1.1));
+    var rim = new THREE.DirectionalLight(0xc9a96e, 1.6);
+    rim.position.set(10, 22, -24);
+    scene.add(rim);
+    var warm = new THREE.PointLight(0xd8b77c, 1.6, 60, 1.8);
+    warm.position.set(0, 12, -6);
+    scene.add(warm);
+    var cool = new THREE.DirectionalLight(0x1e2533, 0.7);
+    cool.position.set(-16, 8, 18);
+    scene.add(cool);
 
-        contactCard.addEventListener('mouseleave', function () {
-          contactCard.style.transform = 'rotateX(0deg) rotateY(0deg)';
-        });
-      }
+    /* Floor: dark, glossy */
+    var floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(200, 200),
+      new THREE.MeshStandardMaterial({ color: 0x030303, roughness: 0.32, metalness: 0.9 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    scene.add(floor);
 
-      /* Magnetic hover effect on CTA buttons */
-      buttons.forEach(function (btn) {
-        btn.addEventListener('mouseenter', function () {
-          if (cursorRing) cursorRing.classList.add('is-hovering');
-        });
-        btn.addEventListener('mouseleave', function () {
-          if (cursorRing) cursorRing.classList.remove('is-hovering');
-          btn.style.transform = 'translate3d(0, 0, 0)';
-        });
-        if (isFinePointer && !prefersReducedMotion) {
-          btn.addEventListener('mousemove', function (e) {
-            var r = btn.getBoundingClientRect();
-            var dx = e.clientX - (r.left + r.width * 0.5);
-            var dy = e.clientY - (r.top + r.height * 0.5);
-            btn.style.transform = 'translate3d(' + (dx * 0.22).toFixed(2) + 'px, ' + (dy * 0.28).toFixed(2) + 'px, 0)';
-          }, { passive: true });
-        }
-      });
+    /* Seeded random so the skyline is the same on every visit */
+    var seed = 20241;
+    function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
 
-      /* --------------------------------------------------------
-       * 2. Mobile Gyroscope / DeviceOrientation (iOS 13+ safe)
-       * -------------------------------------------------------- */
-      var gyroX = 0;
-      var gyroY = 0;
-      var gyroConnected = false;
-
-      var gyroBaseBeta = null;
-      var gyroBaseGamma = null;
-
-      function attachOrientationListener() {
-        if (gyroConnected) return;
-        gyroConnected = true;
-        window.addEventListener('deviceorientation', function (e) {
-          if (e.gamma === null || e.beta === null) return;
-          // Relative to the pose the phone was held in at first reading, so it starts centred
-          if (gyroBaseBeta === null) { gyroBaseBeta = e.beta; gyroBaseGamma = e.gamma; }
-          var dGamma = Math.max(-25, Math.min(25, e.gamma - gyroBaseGamma));
-          var dBeta = Math.max(-25, Math.min(25, e.beta - gyroBaseBeta));
-          // Gentle: max ±0.45 of the desktop parallax range
-          gyroX = (dGamma / 25) * 0.45;
-          gyroY = (dBeta / 25) * 0.45;
-        }, { passive: true });
-      }
-
-      if (typeof window.DeviceOrientationEvent !== 'undefined') {
-        if (typeof window.DeviceOrientationEvent.requestPermission === 'function') {
-          var requestIosGyro = function () {
-            window.DeviceOrientationEvent.requestPermission()
-              .then(function (state) {
-                if (state === 'granted') {
-                  attachOrientationListener();
-                }
-              })
-              .catch(function () { /* gracefully ignore if declined */ });
-            window.removeEventListener('touchend', requestIosGyro);
-            window.removeEventListener('click', requestIosGyro);
-          };
-          window.addEventListener('touchend', requestIosGyro, { once: true, passive: true });
-          window.addEventListener('click', requestIosGyro, { once: true, passive: true });
-        } else {
-          attachOrientationListener();
-        }
-      }
-
-      /* --------------------------------------------------------
-       * 3. Three.js 3D Bangkok Skyline Scene
-       * -------------------------------------------------------- */
-      var canvas = document.getElementById('skyline-canvas');
-      if (!canvas || typeof window.THREE === 'undefined') {
-        document.body.classList.add('webgl-fallback');
-        return;
-      }
-
-      var renderer;
-      try {
-        renderer = new THREE.WebGLRenderer({
-          canvas: canvas,
-          antialias: !isMobile,
-          alpha: true,
-          powerPreference: 'high-performance'
-        });
-      } catch (err) {
-        document.body.classList.add('webgl-fallback');
-        return;
-      }
-
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
-
-      var scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x060609, 0.032);
-
-      var camera = new THREE.PerspectiveCamera(
-        isPortrait ? 52 : 46,
-        window.innerWidth / window.innerHeight,
-        0.5,
-        120
-      );
-
-      // Camera intro pull-back coordinates
-      // Portrait phones: camera further back and lower, looking up, so the towers
-      // sit in the lower part of the frame and frame the text instead of covering it
-      var camStartZ = isPortrait ? 22.0 : (isMobile ? 16.5 : 14.0);
-      var camEndZ = isPortrait ? 34.0 : (isMobile ? 25.5 : 22.0);
-      var camStartY = isPortrait ? 2.6 : 4.2;
-      var camEndY = isPortrait ? 3.2 : 6.2;
-      var lookY = isPortrait ? 9.5 : 4.7;
-      camera.position.set(0, camStartY, camStartZ);
-
-      // Lighting: Dark atmospheric ambient + soft gold rim lights
-      var ambientLight = new THREE.AmbientLight(0x181822, 1.3);
-      scene.add(ambientLight);
-
-      var rimLightGold = new THREE.DirectionalLight(0xc9a96e, 2.2);
-      rimLightGold.position.set(14, 28, -16);
-      scene.add(rimLightGold);
-
-      var rimLightWarm = new THREE.PointLight(0xe5cb96, 2.4, 55, 1.6);
-      rimLightWarm.position.set(0, 14, -8);
-      scene.add(rimLightWarm);
-
-      var coolFillLight = new THREE.DirectionalLight(0x28324a, 0.85);
-      coolFillLight.position.set(-18, 10, 16);
-      scene.add(coolFillLight);
-
-      // Subtle reflective floor + architectural gold ground grid
-      var floorGeo = new THREE.PlaneGeometry(160, 160);
-      var floorMat = new THREE.MeshStandardMaterial({
-        color: 0x050507,
-        roughness: 0.18,
-        metalness: 0.88
-      });
-      var floor = new THREE.Mesh(floorGeo, floorMat);
-      floor.rotation.x = -Math.PI / 2;
-      floor.position.y = 0;
-      scene.add(floor);
-
-      var gridHelper = new THREE.GridHelper(90, isMobile ? 36 : 54, 0xc9a96e, 0xc9a96e);
-      gridHelper.position.y = 0.01;
-      gridHelper.material.transparent = true;
-      gridHelper.material.opacity = 0.08;
-      scene.add(gridHelper);
-
-      // Procedural window texture for black glass towers
-      function createTowerTexture(seed) {
-        var c = document.createElement('canvas');
-        c.width = 64;
-        c.height = 256;
-        var ctx = c.getContext('2d');
-
-        ctx.fillStyle = '#07070b';
-        ctx.fillRect(0, 0, c.width, c.height);
-
-        // Subtle vertical mullions
-        ctx.fillStyle = 'rgba(201, 169, 110, 0.05)';
-        for (var gx = 0; gx < c.width; gx += 8) {
-          ctx.fillRect(gx, 0, 1, c.height);
-        }
-
-        // Sparse warm lit luxury penthouse/condo windows
-        var s = seed * 9301 + 49297;
-        var rand = function () {
-          s = (s * 9301 + 49297) % 233280;
-          return s / 233280;
-        };
-
-        for (var row = 4; row < c.height - 8; row += 6) {
-          for (var col = 2; col < c.width - 4; col += 8) {
-            var r = rand();
-            if (r > 0.915) {
-              var alpha = 0.45 + rand() * 0.5;
-              ctx.fillStyle = r > 0.965
-                ? 'rgba(248, 224, 176, ' + alpha.toFixed(2) + ')'
-                : 'rgba(201, 169, 110, ' + (alpha * 0.78).toFixed(2) + ')';
-              ctx.fillRect(col, row, 5, 2.5);
-            }
-          }
-        }
-
-        var tex = new THREE.CanvasTexture(c);
-        tex.wrapS = THREE.RepeatWrapping;
-        tex.wrapT = THREE.RepeatWrapping;
-        return tex;
-      }
-
-      var towerTextures = [
-        createTowerTexture(1),
-        createTowerTexture(2),
-        createTowerTexture(3),
-        createTowerTexture(4)
-      ];
-
-      var towerMaterials = towerTextures.map(function (tex) {
-        return new THREE.MeshStandardMaterial({
-          color: 0x08080d,
-          roughness: 0.14,
-          metalness: 0.92,
-          emissive: 0xc9a96e,
-          emissiveMap: tex,
-          emissiveIntensity: 0.95
-        });
-      });
-
-      var roofCapMat = new THREE.MeshStandardMaterial({
-        color: 0x060609,
-        roughness: 0.25,
-        metalness: 0.85
-      });
-
-      var edgeMatBright = new THREE.LineBasicMaterial({
-        color: 0xc9a96e,
-        transparent: true,
-        opacity: 0.52
-      });
-
-      var edgeMatSoft = new THREE.LineBasicMaterial({
-        color: 0xc9a96e,
-        transparent: true,
-        opacity: 0.22
-      });
-
-      var reflectionEdgeMat = new THREE.LineBasicMaterial({
-        color: 0xc9a96e,
-        transparent: true,
-        opacity: 0.08
-      });
-
-      // Build Bangkok Skyline Group
-      var skylineGroup = new THREE.Group();
-      scene.add(skylineGroup);
-
-      var towerCount = isMobile ? 18 : 48;
-      var dSeed = 1337;
-      function nextRand() {
-        dSeed = (dSeed * 16807) % 2147483647;
-        return (dSeed - 1) / 2147483646;
-      }
-
-      function addTowerSection(w, h, d, x, y, z, matIndex, isCrown) {
-        var geo = new THREE.BoxGeometry(w, h, d);
-        var sideMat = towerMaterials[matIndex % towerMaterials.length];
-        var mats = [sideMat, sideMat, roofCapMat, roofCapMat, sideMat, sideMat];
-        var mesh = new THREE.Mesh(geo, mats);
-        mesh.position.set(x, y, z);
-        skylineGroup.add(mesh);
-
-        var edges = new THREE.EdgesGeometry(geo);
-        var line = new THREE.LineSegments(edges, isCrown ? edgeMatBright : edgeMatSoft);
-        line.position.copy(mesh.position);
-        skylineGroup.add(line);
-
-        // Subtle mirrored wireframe reflection beneath the glossy floor
-        if (y - h * 0.5 < 0.2) {
-          var reflLine = new THREE.LineSegments(edges, reflectionEdgeMat);
-          reflLine.position.set(x, -y, z);
-          skylineGroup.add(reflLine);
-        }
-      }
-
-      for (var i = 0; i < towerCount; i++) {
-        // Arrange towers across the horizon with an architectural focal cluster
-        var spread = (i / (towerCount - 1) - 0.5) * 2; // -1 to 1
-        var x = spread * (isMobile ? 22 : 32) + (nextRand() - 0.5) * 2.4;
-        var z = -2.5 - Math.pow(Math.abs(spread), 0.85) * 10 - nextRand() * 14;
-
-        var distFromCenter = Math.abs(x);
-        var centrality = Math.max(0.15, 1 - distFromCenter / 26);
-
-        var w = 0.85 + nextRand() * 1.45;
-        var d = 0.85 + nextRand() * 1.45;
-        var h = (3.8 + nextRand() * 11.5) * (0.55 + centrality * 0.65);
-
-        // Hero supertall landmarks near center-back
-        if (i % 7 === 0 && distFromCenter < 11) {
-          h *= 1.32;
-        }
-
-        var matIdx = i % towerMaterials.length;
-        addTowerSection(w, h, d, x, h * 0.5, z, matIdx, i % 3 === 0);
-
-        // Stepped architectural setback / crown tier (classic Bangkok luxury high-rise silhouette)
-        if (h > 8.5 && nextRand() > 0.35) {
-          var crownW = w * 0.68;
-          var crownD = d * 0.68;
-          var crownH = 1.4 + nextRand() * 2.4;
-          addTowerSection(crownW, crownH, crownD, x, h + crownH * 0.5, z, matIdx, true);
-
-          // Fine gold spire on select flagship towers
-          if (nextRand() > 0.55) {
-            var spireGeo = new THREE.BufferGeometry().setFromPoints([
-              new THREE.Vector3(x, h + crownH, z),
-              new THREE.Vector3(x, h + crownH + 1.8 + nextRand() * 1.5, z)
-            ]);
-            var spire = new THREE.Line(spireGeo, edgeMatBright);
-            skylineGroup.add(spire);
+    /* Window textures: black glass with a few warm lit windows */
+    function windowTexture() {
+      var c = document.createElement('canvas');
+      c.width = 64; c.height = 256;
+      var g = c.getContext('2d');
+      g.fillStyle = '#000';
+      g.fillRect(0, 0, 64, 256);
+      g.fillStyle = 'rgba(201,169,110,0.05)';
+      for (var x = 0; x < 64; x += 8) g.fillRect(x, 0, 1, 256);
+      for (var y = 6; y < 250; y += 7) {
+        for (var cx = 2; cx < 60; cx += 8) {
+          var r = rnd();
+          if (r > 0.93) {
+            var a = 0.45 + rnd() * 0.5;
+            g.fillStyle = r > 0.975 ? 'rgba(255,228,180,' + a + ')' : 'rgba(201,169,110,' + (a * 0.7) + ')';
+            g.fillRect(cx, y, 5, 3);
           }
         }
       }
-
-      // Warm glowing penthouse sky-lounges (featured lit horizontal bands)
-      var skyLoungeMat = new THREE.MeshBasicMaterial({
-        color: 0xe8cc94,
-        transparent: true,
-        opacity: 0.78
+      var t = new THREE.CanvasTexture(c);
+      t.encoding = THREE.sRGBEncoding;
+      return t;
+    }
+    var glass = [windowTexture(), windowTexture(), windowTexture()].map(function (tex) {
+      return new THREE.MeshStandardMaterial({
+        color: 0x050505, roughness: 0.12, metalness: 0.95,
+        emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.9
       });
-      for (var k = 0; k < (isMobile ? 4 : 12); k++) {
-        var lx = (nextRand() - 0.5) * 18;
-        var lz = -4 - nextRand() * 11;
-        var ly = 5.5 + nextRand() * 7.5;
-        var loungeGeo = new THREE.BoxGeometry(0.95, 0.11, 0.95);
-        var loungeMesh = new THREE.Mesh(loungeGeo, skyLoungeMat);
-        loungeMesh.position.set(lx, ly, lz);
-        skylineGroup.add(loungeMesh);
+    });
+    var roof = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.3, metalness: 0.8 });
+    var edgeBright = new THREE.LineBasicMaterial({ color: 0xc9a96e, transparent: true, opacity: 0.5 });
+    var edgeSoft = new THREE.LineBasicMaterial({ color: 0xc9a96e, transparent: true, opacity: 0.2 });
+    var edgeMirror = new THREE.LineBasicMaterial({ color: 0xc9a96e, transparent: true, opacity: 0.06 });
+
+    var city = new THREE.Group();
+    scene.add(city);
+
+    function block(w, h, d, x, y, z, mat, bright) {
+      var geo = new THREE.BoxGeometry(w, h, d);
+      var mesh = new THREE.Mesh(geo, [mat, mat, roof, roof, mat, mat]);
+      mesh.position.set(x, y, z);
+      city.add(mesh);
+      var edges = new THREE.EdgesGeometry(geo);
+      var line = new THREE.LineSegments(edges, bright ? edgeBright : edgeSoft);
+      line.position.set(x, y, z);
+      city.add(line);
+      var mirror = new THREE.LineSegments(edges, edgeMirror);   // faint reflection in the floor
+      mirror.position.set(x, -y, z);
+      city.add(mirror);
+    }
+
+    var towers = mobile ? 16 : 38;
+    var width = portrait ? 16 : 30;
+    for (var i = 0; i < towers; i++) {
+      var s = towers === 1 ? 0 : (i / (towers - 1)) * 2 - 1;     // -1 … 1 across the horizon
+      var x = s * width + (rnd() - 0.5) * 2;
+      var z = -3 - Math.pow(Math.abs(s), 0.8) * 9 - rnd() * 13;
+      var centre = Math.max(0.25, 1 - Math.abs(x) / (width * 0.9));
+      var w = 1 + rnd() * 1.4, d = 1 + rnd() * 1.4;
+      var h = (4 + rnd() * 11) * (0.55 + centre * 0.7);
+      if (i % 6 === 0 && Math.abs(x) < width * 0.4) h *= 1.3;
+      var mat = glass[i % glass.length];
+      block(w, h, d, x, h / 2, z, mat, i % 3 === 0);
+      if (h > 9 && rnd() > 0.4) {                                 // stepped crown
+        var ch = 1.2 + rnd() * 2;
+        block(w * 0.66, ch, d * 0.66, x, h + ch / 2, z, mat, true);
+        if (rnd() > 0.5) {                                        // thin gold spire
+          var sp = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(x, h + ch, z), new THREE.Vector3(x, h + ch + 1.5 + rnd() * 1.5, z)
+          ]);
+          city.add(new THREE.Line(sp, edgeBright));
+        }
       }
+    }
 
-      // Floating fine gold dust particles
-      var particleCount = isMobile ? 70 : 280;
-      var particleGeo = new THREE.BufferGeometry();
-      var positions = new Float32Array(particleCount * 3);
-      var speeds = new Float32Array(particleCount);
-      var phases = new Float32Array(particleCount);
+    /* Gold dust */
+    var N = mobile ? 60 : 220;
+    var pos = new Float32Array(N * 3), speed = new Float32Array(N), phase = new Float32Array(N);
+    for (var p = 0; p < N; p++) {
+      pos[p * 3] = (rnd() - 0.5) * 40;
+      pos[p * 3 + 1] = rnd() * 18;
+      pos[p * 3 + 2] = (rnd() - 0.5) * 30;
+      speed[p] = 0.25 + rnd() * 0.5;
+      phase[p] = rnd() * Math.PI * 2;
+    }
+    var dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    var sc = document.createElement('canvas');
+    sc.width = sc.height = 32;
+    var sg = sc.getContext('2d');
+    var grad = sg.createRadialGradient(16, 16, 0, 16, 16, 16);
+    grad.addColorStop(0, 'rgba(255,238,205,1)');
+    grad.addColorStop(0.35, 'rgba(201,169,110,0.6)');
+    grad.addColorStop(1, 'rgba(201,169,110,0)');
+    sg.fillStyle = grad;
+    sg.fillRect(0, 0, 32, 32);
+    var dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+      map: new THREE.CanvasTexture(sc), size: mobile ? 0.22 : 0.18,
+      transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending
+    }));
+    scene.add(dust);
 
-      for (var p = 0; p < particleCount; p++) {
-        positions[p * 3] = (nextRand() - 0.5) * 38;
-        positions[p * 3 + 1] = nextRand() * 18 + 0.3;
-        positions[p * 3 + 2] = (nextRand() - 0.5) * 28 + 2;
-        speeds[p] = 0.006 + nextRand() * 0.014;
-        phases[p] = nextRand() * Math.PI * 2;
-      }
-
-      particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-      // Soft circular gold particle sprite
-      var spriteCanvas = document.createElement('canvas');
-      spriteCanvas.width = 32;
-      spriteCanvas.height = 32;
-      var sCtx = spriteCanvas.getContext('2d');
-      var grad = sCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-      grad.addColorStop(0, 'rgba(255, 240, 205, 1)');
-      grad.addColorStop(0.35, 'rgba(201, 169, 110, 0.75)');
-      grad.addColorStop(1, 'rgba(201, 169, 110, 0)');
-      sCtx.fillStyle = grad;
-      sCtx.fillRect(0, 0, 32, 32);
-
-      var particleTex = new THREE.CanvasTexture(spriteCanvas);
-      var particleMat = new THREE.PointsMaterial({
-        map: particleTex,
-        size: isMobile ? 0.24 : 0.2,
-        transparent: true,
-        opacity: 0.72,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending
-      });
-
-      var goldDust = new THREE.Points(particleGeo, particleMat);
-      scene.add(goldDust);
-
-      // Handle viewport resize — ignore the small height jumps from the
-      // mobile Safari address bar showing/hiding (avoids canvas re-allocation jank)
-      var lastW = window.innerWidth;
-      var lastH = window.innerHeight;
-      window.addEventListener('resize', function () {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        if (w === lastW && Math.abs(h - lastH) < 140) return;
-        lastW = w;
-        lastH = h;
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
-        renderer.setSize(w, h);
+    /* Desktop-only mouse parallax */
+    var mx = 0, my = 0, px = 0, py = 0;
+    if (finePointer) {
+      window.addEventListener('mousemove', function (e) {
+        mx = (e.clientX / window.innerWidth) * 2 - 1;
+        my = (e.clientY / window.innerHeight) * 2 - 1;
       }, { passive: true });
+    }
 
-      // If reduced motion is preferred, render static frame at final camera position
-      if (prefersReducedMotion) {
-        camera.position.set(0, camEndY, camEndZ);
-        camera.lookAt(0, lookY, -6);
-        renderer.render(scene, camera);
-        canvas.classList.add('is-ready');
-        return;
+    /* Resize — ignore small height changes from the mobile browser bar */
+    var lastW = window.innerWidth, lastH = window.innerHeight;
+    window.addEventListener('resize', function () {
+      var w = window.innerWidth, h = window.innerHeight;
+      if (w === lastW && Math.abs(h - lastH) < 140) return;
+      lastW = w; lastH = h;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+    }, { passive: true });
+
+    /* Loop */
+    var INTRO = 4000;
+    var start = null, prev = 0;
+    function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
+
+    function frame(now) {
+      requestAnimationFrame(frame);
+      if (start === null) { start = now; prev = now; }
+      var dt = Math.min(0.05, (now - prev) / 1000);
+      prev = now;
+      var el = now - start, t = el / 1000;
+
+      var k = easeOut(Math.min(1, el / INTRO));
+      var drift = easeOut(Math.min(1, el / (INTRO * 1.4)));    // drift fades in after the pull-back
+
+      px += (mx - px) * 0.04;
+      py += (my - py) * 0.04;
+
+      camera.position.x = Math.sin(t * 0.15) * CAM.sway * drift + px * 1.6;
+      camera.position.y = CAM.y0 + (CAM.y1 - CAM.y0) * k + Math.cos(t * 0.11) * 0.25 * drift - py * 0.6;
+      camera.position.z = CAM.z0 + (CAM.z1 - CAM.z0) * k + Math.sin(t * 0.09) * 0.6 * drift;
+      camera.lookAt(px * 0.6, CAM.look - py * 0.3, -6);
+
+      var a = dustGeo.attributes.position.array;
+      for (var j = 0; j < N; j++) {
+        a[j * 3 + 1] += speed[j] * dt;
+        a[j * 3] += Math.sin(t * 0.5 + phase[j]) * 0.12 * dt;
+        if (a[j * 3 + 1] > 18) a[j * 3 + 1] = 0;
       }
+      dustGeo.attributes.position.needsUpdate = true;
 
-      // Animation loop: intro camera pull-back + slow cinematic drift + parallax + dust
-      var startTime = null;
-      var introDuration = 3800; // ms
-      var currentParallaxX = 0;
-      var currentParallaxY = 0;
-
-      function easeOutQuint(t) {
-        return 1 - Math.pow(1 - t, 5);
-      }
-
-      function animate(now) {
-        requestAnimationFrame(animate);
-
-        // Start the clock on the first real frame, and reveal the canvas only
-        // once something has been drawn — no jump on slow devices
-        if (startTime === null) {
-          startTime = now;
-          renderer.render(scene, camera);
-          canvas.classList.add('is-ready');
-        }
-
-        var elapsed = now - startTime;
-        var t = elapsed * 0.001;
-
-        // Intro pull-back
-        var introProgress = Math.min(1, elapsed / introDuration);
-        var introEase = easeOutQuint(introProgress);
-        var baseZ = camStartZ + (camEndZ - camStartZ) * introEase;
-        var baseY = camStartY + (camEndY - camStartY) * introEase;
-
-        // Combine desktop mouse and mobile gyroscope input
-        var targetInputX = isFinePointer ? normX : gyroX;
-        var targetInputY = isFinePointer ? normY : gyroY;
-
-        var lerp = isFinePointer ? 0.045 : 0.03;
-        currentParallaxX += (targetInputX - currentParallaxX) * lerp;
-        currentParallaxY += (targetInputY - currentParallaxY) * lerp;
-
-        // Slow cinematic camera drift (always on, even without gyro permission),
-        // faded in after the intro so the pull-back stays clean
-        var driftIn = easeOutQuint(Math.min(1, elapsed / (introDuration * 1.3)));
-        var driftX = Math.sin(t * 0.16) * (isPortrait ? 0.9 : 1.35) * driftIn;
-        var driftY = Math.cos(t * 0.12) * 0.3 * driftIn;
-        var driftZ = Math.sin(t * 0.1) * 0.65 * driftIn;
-
-        camera.position.x = driftX + currentParallaxX * 2.2;
-        camera.position.y = Math.max(isPortrait ? 1.6 : 2.2, baseY + driftY - currentParallaxY * 0.9);
-        camera.position.z = baseZ + driftZ;
-
-        camera.lookAt(
-          currentParallaxX * 0.7,
-          lookY - currentParallaxY * 0.4,
-          -6
-        );
-
-        // Update floating gold dust particles
-        var posAttr = particleGeo.attributes.position;
-        var arr = posAttr.array;
-        for (var i = 0; i < particleCount; i++) {
-          var idx = i * 3;
-          arr[idx + 1] += speeds[i];
-          arr[idx] += Math.sin(t * 0.6 + phases[i]) * 0.003;
-          if (arr[idx + 1] > 18.5) {
-            arr[idx + 1] = 0.2;
-          }
-        }
-        posAttr.needsUpdate = true;
-
-        renderer.render(scene, camera);
-      }
-
-      requestAnimationFrame(animate);
-    })();
+      renderer.render(scene, camera);
+      if (el === 0) canvas.classList.add('ready');            // fade in once the first frame is drawn
+    }
+    requestAnimationFrame(frame);
+  })();
   </script>
 </body>
 </html>
