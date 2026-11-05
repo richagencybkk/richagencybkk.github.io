@@ -52,7 +52,8 @@
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
-      selection-background-color: var(--gold);
+      overflow-x: clip;
+      max-width: 100%;
     }
 
     ::selection {
@@ -63,7 +64,7 @@
     body {
       position: relative;
       min-height: 100vh;
-      min-height: 100dvh;
+      min-height: 100svh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -94,7 +95,7 @@
       z-index: 0;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 2.2s var(--ease-out-expo);
+      transition: opacity 2.8s cubic-bezier(0.33, 1, 0.68, 1);
     }
 
     #skyline-canvas.is-ready {
@@ -114,23 +115,22 @@
 
     .grain-overlay {
       position: fixed;
-      inset: -40%;
-      width: 180%;
-      height: 180%;
+      inset: 0;
       z-index: 2;
       pointer-events: none;
       opacity: 0.038;
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
       animation: grainShift 7s steps(8) infinite;
     }
 
     @keyframes grainShift {
-      0%, 100% { transform: translate(0, 0); }
-      20% { transform: translate(-3%, 2%); }
-      40% { transform: translate(2%, -3%); }
-      60% { transform: translate(-2%, -2%); }
-      80% { transform: translate(3%, 1%); }
+      0%, 100% { background-position: 0 0; }
+      20% { background-position: -37px 23px; }
+      40% { background-position: 29px -41px; }
+      60% { background-position: -23px -31px; }
+      80% { background-position: 43px 13px; }
     }
 
     /* Custom smooth cursor (Desktop only) */
@@ -190,16 +190,16 @@
       z-index: 5;
       width: 100%;
       min-height: 100vh;
-      min-height: 100dvh;
+      min-height: 100svh;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
       padding:
-        max(1.75rem, env(safe-area-inset-top, 1.75rem))
-        max(1.25rem, env(safe-area-inset-right, 1.25rem))
-        max(1.4rem, env(safe-area-inset-bottom, 1.4rem))
-        max(1.25rem, env(safe-area-inset-left, 1.25rem));
+        max(1.75rem, env(safe-area-inset-top, 0px))
+        max(20px, env(safe-area-inset-right, 0px))
+        max(1.4rem, env(safe-area-inset-bottom, 0px))
+        max(20px, env(safe-area-inset-left, 0px));
     }
 
     .top-bar {
@@ -247,7 +247,7 @@
     .brand-title {
       font-family: var(--font-serif);
       font-weight: 300;
-      font-size: clamp(2.45rem, 8.2vw, 5.75rem);
+      font-size: clamp(1.6rem, 8.2vw, 5.75rem);
       line-height: 1.04;
       letter-spacing: 0.28em;
       padding-left: 0.28em; /* Optical balance for wide letter-spacing */
@@ -256,17 +256,26 @@
       text-shadow: 0 12px 42px rgba(0, 0, 0, 0.75);
       margin-bottom: 1.15rem;
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      white-space: nowrap;
       justify-content: center;
+      max-width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .brand-title {
+        letter-spacing: 0.16em;
+        padding-left: 0.16em;
+      }
     }
 
     .brand-title .char {
       display: inline-block;
       opacity: 0;
-      filter: blur(14px);
-      transform: translateY(14px) scale(1.04);
-      animation: charReveal 1.35s var(--ease-out-expo) forwards;
-      animation-delay: calc(0.18s + var(--char-index, 0) * 0.075s);
+      filter: blur(10px);
+      transform: translateY(10px);
+      animation: charReveal 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation-delay: calc(0.35s + var(--char-index, 0) * 0.07s);
       will-change: transform, opacity, filter;
     }
 
@@ -277,16 +286,16 @@
     @keyframes charReveal {
       0% {
         opacity: 0;
-        filter: blur(14px);
-        transform: translateY(14px) scale(1.04);
+        filter: blur(10px);
+        transform: translateY(10px);
       }
-      60% {
+      55% {
         opacity: 1;
       }
       100% {
         opacity: 1;
         filter: blur(0px);
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
       }
     }
 
@@ -303,7 +312,8 @@
     .gold-draw-line {
       position: relative;
       display: block;
-      width: clamp(28px, 8vw, 76px);
+      flex-shrink: 0;
+      width: clamp(18px, 6vw, 76px);
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), var(--gold-bright));
       transform: scaleX(0);
@@ -360,19 +370,41 @@
 
     @media (max-width: 400px) {
       .brand-subtitle {
-        letter-spacing: 0.22em;
-        padding-left: 0.22em;
-        font-size: 0.64rem;
+        letter-spacing: 0.2em;
+        padding-left: 0.2em;
+        font-size: 0.62rem;
       }
+    }
+
+    @media (max-width: 350px) {
+      .gold-draw-line { display: none; }
     }
 
     /* Glassmorphism Contact Card with 3D Tilt & Moving Light Sheen */
     .card-perspective {
+      position: relative;
       perspective: 1100px;
       width: 100%;
       max-width: 470px;
       opacity: 0;
-      animation: cardEntrance 1.5s var(--ease-out-expo) 1.15s forwards;
+      animation: cardEntrance 1.8s cubic-bezier(0.22, 1, 0.36, 1) 1.3s forwards;
+    }
+
+    /* Dark readability halo behind the card */
+    .card-perspective::before {
+      content: "";
+      position: absolute;
+      inset: -56px 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(closest-side, rgba(4, 4, 6, 0.78), rgba(4, 4, 6, 0.4) 60%, transparent);
+      transform: scale(1.25, 1.15);
+    }
+
+    @media (max-width: 600px) {
+      .card-perspective::before {
+        background: radial-gradient(closest-side, rgba(4, 4, 6, 0.88), rgba(4, 4, 6, 0.55) 60%, transparent);
+      }
     }
 
     @keyframes cardEntrance {
@@ -392,14 +424,16 @@
       padding: clamp(1.85rem, 5vw, 2.65rem) clamp(1.4rem, 4.5vw, 2.4rem);
       border-radius: 20px;
       background:
-        linear-gradient(145deg, rgba(24, 22, 28, 0.68) 0%, rgba(10, 10, 14, 0.52) 100%);
-      backdrop-filter: blur(22px) saturate(140%);
-      -webkit-backdrop-filter: blur(22px) saturate(140%);
-      border: 1px solid var(--gold-border);
+        linear-gradient(145deg, rgba(255, 248, 236, 0.075) 0%, rgba(255, 248, 236, 0.02) 45%, rgba(10, 10, 14, 0.5) 100%),
+        rgba(14, 13, 18, 0.55);
+      backdrop-filter: blur(26px) saturate(150%);
+      -webkit-backdrop-filter: blur(26px) saturate(150%);
+      border: 1px solid rgba(201, 169, 110, 0.26);
       box-shadow:
         0 28px 68px -16px rgba(0, 0, 0, 0.82),
-        0 0 38px -10px rgba(201, 169, 110, 0.14),
-        inset 0 1px 0 0 rgba(255, 243, 219, 0.16);
+        0 0 30px -12px rgba(201, 169, 110, 0.1),
+        inset 0 1px 0 0 rgba(255, 243, 219, 0.22),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.03);
       transform-style: preserve-3d;
       transition: transform 0.22s ease-out, border-color 0.4s ease, box-shadow 0.4s ease;
       overflow: hidden;
@@ -478,9 +512,13 @@
       gap: 0.9rem;
     }
 
-    @media (max-width: 440px) {
+    @media (max-width: 600px) {
       .cta-group {
         grid-template-columns: 1fr;
+      }
+      .luxury-btn {
+        min-height: 56px;
+        font-size: 0.84rem;
       }
     }
 
@@ -494,8 +532,8 @@
       min-height: 52px;
       padding: 0.85rem 1.25rem;
       border-radius: 12px;
-      border: 1px solid rgba(201, 169, 110, 0.44);
-      background: rgba(15, 14, 19, 0.72);
+      border: 1px solid rgba(201, 169, 110, 0.32);
+      background: rgba(15, 14, 19, 0.6);
       color: var(--text-primary);
       text-decoration: none;
       font-family: var(--font-sans);
@@ -518,10 +556,10 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, #d7b980 0%, #c9a96e 50%, #b38e4c 100%);
+      background: linear-gradient(110deg, rgba(201, 169, 110, 0.10) 0%, rgba(229, 203, 150, 0.2) 50%, rgba(201, 169, 110, 0.12) 100%);
       transform: scaleX(0);
       transform-origin: right center;
-      transition: transform 0.5s var(--ease-out-expo);
+      transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
       z-index: 0;
     }
 
@@ -535,10 +573,10 @@
     .luxury-btn:hover,
     .luxury-btn:focus-visible,
     .luxury-btn:active {
-      color: #09080b;
-      border-color: var(--gold-bright);
+      color: var(--gold-bright);
+      border-color: rgba(229, 203, 150, 0.7);
       box-shadow:
-        0 0 26px rgba(201, 169, 110, 0.42),
+        0 0 22px -4px rgba(201, 169, 110, 0.28),
         0 8px 22px -6px rgba(0, 0, 0, 0.65);
       outline: none;
     }
@@ -712,6 +750,8 @@
       var isFinePointer = window.matchMedia &&
         window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       var isMobile = window.innerWidth < 768 || !isFinePointer;
+      var isPortrait = window.innerWidth / window.innerHeight < 0.85;
+      var maxDpr = isMobile ? 1.5 : 2;
 
       /* --------------------------------------------------------
        * 1. Custom Smooth Cursor + Magnetic Buttons + Card 3D Tilt
@@ -801,15 +841,21 @@
       var gyroY = 0;
       var gyroConnected = false;
 
+      var gyroBaseBeta = null;
+      var gyroBaseGamma = null;
+
       function attachOrientationListener() {
         if (gyroConnected) return;
         gyroConnected = true;
         window.addEventListener('deviceorientation', function (e) {
           if (e.gamma === null || e.beta === null) return;
-          var clampedGamma = Math.max(-35, Math.min(35, e.gamma));
-          var clampedBeta = Math.max(-35, Math.min(35, e.beta - 40));
-          gyroX = clampedGamma / 35;
-          gyroY = clampedBeta / 35;
+          // Relative to the pose the phone was held in at first reading, so it starts centred
+          if (gyroBaseBeta === null) { gyroBaseBeta = e.beta; gyroBaseGamma = e.gamma; }
+          var dGamma = Math.max(-25, Math.min(25, e.gamma - gyroBaseGamma));
+          var dBeta = Math.max(-25, Math.min(25, e.beta - gyroBaseBeta));
+          // Gentle: max ±0.45 of the desktop parallax range
+          gyroX = (dGamma / 25) * 0.45;
+          gyroY = (dBeta / 25) * 0.45;
         }, { passive: true });
       }
 
@@ -855,7 +901,7 @@
         return;
       }
 
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.1;
@@ -864,17 +910,20 @@
       scene.fog = new THREE.FogExp2(0x060609, 0.032);
 
       var camera = new THREE.PerspectiveCamera(
-        46,
+        isPortrait ? 52 : 46,
         window.innerWidth / window.innerHeight,
         0.5,
         120
       );
 
       // Camera intro pull-back coordinates
-      var camStartZ = isMobile ? 16.5 : 14.0;
-      var camEndZ = isMobile ? 25.5 : 22.0;
-      var camStartY = 4.2;
-      var camEndY = 6.2;
+      // Portrait phones: camera further back and lower, looking up, so the towers
+      // sit in the lower part of the frame and frame the text instead of covering it
+      var camStartZ = isPortrait ? 22.0 : (isMobile ? 16.5 : 14.0);
+      var camEndZ = isPortrait ? 34.0 : (isMobile ? 25.5 : 22.0);
+      var camStartY = isPortrait ? 2.6 : 4.2;
+      var camEndY = isPortrait ? 3.2 : 6.2;
+      var lookY = isPortrait ? 9.5 : 4.7;
       camera.position.set(0, camStartY, camStartZ);
 
       // Lighting: Dark atmospheric ambient + soft gold rim lights
@@ -999,7 +1048,7 @@
       var skylineGroup = new THREE.Group();
       scene.add(skylineGroup);
 
-      var towerCount = isMobile ? 28 : 48;
+      var towerCount = isMobile ? 18 : 48;
       var dSeed = 1337;
       function nextRand() {
         dSeed = (dSeed * 16807) % 2147483647;
@@ -1073,7 +1122,7 @@
         transparent: true,
         opacity: 0.78
       });
-      for (var k = 0; k < (isMobile ? 6 : 12); k++) {
+      for (var k = 0; k < (isMobile ? 4 : 12); k++) {
         var lx = (nextRand() - 0.5) * 18;
         var lz = -4 - nextRand() * 11;
         var ly = 5.5 + nextRand() * 7.5;
@@ -1084,7 +1133,7 @@
       }
 
       // Floating fine gold dust particles
-      var particleCount = isMobile ? 130 : 280;
+      var particleCount = isMobile ? 70 : 280;
       var particleGeo = new THREE.BufferGeometry();
       var positions = new Float32Array(particleCount * 3);
       var speeds = new Float32Array(particleCount);
@@ -1125,46 +1174,58 @@
       var goldDust = new THREE.Points(particleGeo, particleMat);
       scene.add(goldDust);
 
-      // Reveal canvas smoothly
-      requestAnimationFrame(function () {
-        canvas.classList.add('is-ready');
-      });
-
-      // Handle viewport resize
+      // Handle viewport resize — ignore the small height jumps from the
+      // mobile Safari address bar showing/hiding (avoids canvas re-allocation jank)
+      var lastW = window.innerWidth;
+      var lastH = window.innerHeight;
       window.addEventListener('resize', function () {
-        camera.aspect = window.innerWidth / window.innerHeight;
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if (w === lastW && Math.abs(h - lastH) < 140) return;
+        lastW = w;
+        lastH = h;
+        camera.aspect = w / h;
         camera.updateProjectionMatrix();
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
+        renderer.setSize(w, h);
       }, { passive: true });
 
       // If reduced motion is preferred, render static frame at final camera position
       if (prefersReducedMotion) {
         camera.position.set(0, camEndY, camEndZ);
-        camera.lookAt(0, 4.8, -6);
+        camera.lookAt(0, lookY, -6);
         renderer.render(scene, camera);
+        canvas.classList.add('is-ready');
         return;
       }
 
-      // Animation loop: ~3s intro camera pull-back + slow cinematic drift + parallax + dust
-      var startTime = performance.now();
-      var introDuration = 3100; // ms
+      // Animation loop: intro camera pull-back + slow cinematic drift + parallax + dust
+      var startTime = null;
+      var introDuration = 3800; // ms
       var currentParallaxX = 0;
       var currentParallaxY = 0;
 
-      function easeOutCubic(t) {
-        return 1 - Math.pow(1 - t, 3);
+      function easeOutQuint(t) {
+        return 1 - Math.pow(1 - t, 5);
       }
 
       function animate(now) {
         requestAnimationFrame(animate);
 
+        // Start the clock on the first real frame, and reveal the canvas only
+        // once something has been drawn — no jump on slow devices
+        if (startTime === null) {
+          startTime = now;
+          renderer.render(scene, camera);
+          canvas.classList.add('is-ready');
+        }
+
         var elapsed = now - startTime;
         var t = elapsed * 0.001;
 
-        // Intro pull-back over ~3 seconds
+        // Intro pull-back
         var introProgress = Math.min(1, elapsed / introDuration);
-        var introEase = easeOutCubic(introProgress);
+        var introEase = easeOutQuint(introProgress);
         var baseZ = camStartZ + (camEndZ - camStartZ) * introEase;
         var baseY = camStartY + (camEndY - camStartY) * introEase;
 
@@ -1172,21 +1233,24 @@
         var targetInputX = isFinePointer ? normX : gyroX;
         var targetInputY = isFinePointer ? normY : gyroY;
 
-        currentParallaxX += (targetInputX - currentParallaxX) * 0.045;
-        currentParallaxY += (targetInputY - currentParallaxY) * 0.045;
+        var lerp = isFinePointer ? 0.045 : 0.03;
+        currentParallaxX += (targetInputX - currentParallaxX) * lerp;
+        currentParallaxY += (targetInputY - currentParallaxY) * lerp;
 
-        // Slow cinematic camera drift + interactive parallax
-        var driftX = Math.sin(t * 0.18) * 1.35;
-        var driftY = Math.cos(t * 0.14) * 0.35;
-        var driftZ = Math.sin(t * 0.11) * 0.65;
+        // Slow cinematic camera drift (always on, even without gyro permission),
+        // faded in after the intro so the pull-back stays clean
+        var driftIn = easeOutQuint(Math.min(1, elapsed / (introDuration * 1.3)));
+        var driftX = Math.sin(t * 0.16) * (isPortrait ? 0.9 : 1.35) * driftIn;
+        var driftY = Math.cos(t * 0.12) * 0.3 * driftIn;
+        var driftZ = Math.sin(t * 0.1) * 0.65 * driftIn;
 
         camera.position.x = driftX + currentParallaxX * 2.2;
-        camera.position.y = Math.max(2.2, baseY + driftY - currentParallaxY * 0.9);
+        camera.position.y = Math.max(isPortrait ? 1.6 : 2.2, baseY + driftY - currentParallaxY * 0.9);
         camera.position.z = baseZ + driftZ;
 
         camera.lookAt(
           currentParallaxX * 0.7,
-          4.7 - currentParallaxY * 0.4,
+          lookY - currentParallaxY * 0.4,
           -6
         );
 
